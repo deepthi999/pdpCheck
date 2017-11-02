@@ -1,0 +1,164 @@
+<html>
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Query Preview</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="Style.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="./js/utils/constants.js"></script>
+<script>
+	function LoadDoc() {
+		//document.getElementsByTagName("header")[0].innerHTML = HEADER_SECTION;
+		//document.getElementsByTagName("footer")[0].innerHTML = FOOTER_SECTION;
+		//document.getElementById("reportName").innerHTML = REPORT_NAME;
+	}
+
+	var tablearr = [];
+	var selectedarr = [];
+	var inputarr = [];
+	var tmpinputarr = [];
+
+	function verifying() {
+		var ReportNames = localStorage.getItem('reportsData');
+		var event = JSON.parse(ReportNames);
+		var Reportname = event[0].report_name;
+		document.getElementById("spantext").innerHTML = Reportname;
+	}
+	function EnabledTextarea()
+	  {
+	      document.getElementById("txtArea").disabled = false;
+	  }
+
+</script>
+</head>
+<body onload="LoadDoc(); verifying();">
+
+<div id="header"></div>
+<div class="container">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading" style="text-align: center"> <b style=" font-size: 20px;">Report Name :</b> <span style=" font-size: 20px;" id="spantext"></span></div>
+    <div class="panel-body">
+      <h4 class="text-center"><b>Query Preview</b></h4>
+      <textarea id="txtArea" class="form-control" disabled rows="10" cols="80" name="ReportDescription"></textarea>
+      <div class="row btn-grp" style="margin-top: 15px;text-align: center">
+        <a type="button" class="btn btn-primary" id="btnsave">Validate</a>
+        <a type="button" class="btn btn-primary" href="3.html">Prev</a>
+        <a type="button" class="btn btn-primary" id="btnRun" href="#">Next</a>
+        <!-- <button   style="font-size:13pt; background-color:silver; margin-right:20px;" id="btnRun">Run</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+</body>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		var ReportNames = localStorage.getItem('reportsData');
+		var event = JSON.parse(ReportNames);
+		//alert(event);
+		var reportid = event[0].report_id;
+		//alert("hi..."+ reportid);
+
+		var data = "{" + "report_id" + ":" + reportid + "}";
+	//alert("reportid..."+ data);
+		$.ajax({
+			url : SERVER_URL+'/finalQuery',
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				data = data.returnData;
+
+				console.log(data);
+			 //alert(JSON.stringify(data));
+
+				var Reportname = data[0].v_sql;
+				document.getElementById("txtArea").innerHTML = Reportname;
+
+			}
+		});
+
+	});
+</script>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btnsave").click(function() {
+			data = document.getElementById("txtArea").innerHTML;
+			data = data.replace(/\s+/g, " ");
+			  data = data.replace(/"/g, "'");			//to Replace with single quotes in plcae of "
+			data = "{" + "\"query\"" + ":\"" + data + "\"}";
+			//alert("txtArea" + data);
+
+			$.ajax({
+				url : SERVER_URL+'/ExecutefinaQuery',
+				type : 'POST',
+				data : data,
+				dataType : 'JSON',
+				contentType : "application/json",
+				success : function(data) {
+
+					data = data.returnData;
+
+					//alert(data);
+
+					console.log(data);
+
+				}
+			});
+
+		});
+
+	});
+</script>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btnRun").click(function() {
+			data = document.getElementById("txtArea").innerHTML;
+			data = data.replace(/\s+/g, " ");
+			  data = data.replace(/"/g, "'");			//to Replace with single quotes in plcae of "
+			data = "{" + "\"query\"" + ":\"" + data + "\"}";
+			//alert(data);
+localStorage.setItem('generatedquery',data);
+
+window.open('10.html', '_self');
+			/* $.ajax({
+				url : SERVER_URL+'/runExecutefinaQuery',
+				type : 'POST',
+				data : data,
+				dataType : 'JSON',
+				contentType : "application/json",
+				success : function(data) {
+
+					//alert("success" + JSON.stringify(data));
+					data = data.returnData;
+
+					
+
+					console.log(data);
+
+					localStorage.setItem('queryOutput', JSON.stringify(data));
+					var finalqueryOutput = localStorage.getItem('queryOutput');
+					//alert("finalqueryOutput" + finalqueryOutput);
+					window.open('10.html', '_self');
+					//window.location.href('10.html');
+				}
+			}); */
+
+		});
+
+	});
+</script>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</html>

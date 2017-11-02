@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Report Output</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script type="text/javascript"
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+<script type="text/javascript"
+	src="http://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
+<script type="text/javascript"
+	src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+<script type="text/javascript"
+	src="http://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
+<link rel="stylesheet" href="Style.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="./js/utils/constants.js"></script>
+<script src="js/dynamicFilter.js"></script>
+
+<script>
+	function LoadDoc() {
+		//document.getElementsByTagName("header")[0].innerHTML = HEADER_SECTION;
+		//document.getElementsByTagName("footer")[0].innerHTML = FOOTER_SECTION;
+		//document.getElementById("reportName").innerHTML = REPORT_NAME;
+	}
+
+	function verifying() {
+		var ReportNames = localStorage.getItem('reportsData');
+		var event = JSON.parse(ReportNames);
+		var Reportname = event[0].report_name;
+		//document.getElementById("spantext").innerHTML = Reportname;
+	}
+</script>
+<style>
+
+#thd{
+background-color:#0088cc;
+color:white;
+}
+</style>
+
+</head>
+<body onload="LoadDoc();verifying();">
+	<div id="header"></div>
+
+	<div class="container">
+
+
+
+
+		<div class="panel panel-default panel-box">
+			<div class="panel-heading" style="text-align: center">
+			<table align="center">
+   <tr>
+   <td><b style="font-size:20px;">Organization Name:</b></td>
+   <td><b style="font-size:20px;">PROTO BPCS</b></td>
+   </tr>
+   <tr>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report Name:</b></td>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;General Reports</b></td>
+   </tr>
+   </table>
+			
+				 <!-- <span
+					style="font-size: 20px;" id="spantext"></span> -->
+			</div>
+
+			<!-- RamakrishnaD Filters Concept-->
+			<div class="well" style="margin-top: 15px;">
+				<form id="myForm" action="#">
+					<div class="row">
+						<div class="col-sm-2 col-md-2">
+							<!-- <label style="margin-top: 5px;" id="labe_div"></label> -->
+							
+		        <label style="margin-top:5px;" id="labe_div">ID<br><br>Vendor Name<br><br></label>        
+		     
+						</div>
+						<div class="col-sm-2 col-md-2">
+							<!-- <div style="margin-top: 5px;" id="in_put"></div> -->
+							<div style="margin-top:5px;" id="in_put"><input type="text" id="Ven_name0" name=":param_aph.APHID:" class="form-control Vendor_Name"></div>
+							<!-- <div style="margin-top: 10px;" id="DB"></div> -->
+							<div style="margin-top:10px;" id="DB"><select id="mySelect" name=":param_avm.VENDOR:" class="form-control select_opt"><option value="0" id="opt_id0">0</option><option value="1" id="opt_id1">1</option><option value="2" id="opt_id2">2</option></select></div>
+						</div>
+					</div>
+				</form>
+				<div class="pull-right" style="margin-top: -15px;">
+					<!-- <button class="btn btn-success" onclick="addFilter()">Run
+						Report</button> -->
+						<button class="btn btn-success">Run Report</button>
+				</div>
+			</div>
+			<!-- End Well -->
+
+			<div class="panel-body">
+
+				<div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
+					<div class="row">
+						<!--  
+          <div class="col-md-2">       
+          </div>
+          <div class="col-md-4">
+            <div id="QueryResult" style=""><table><tr><td><table id="example1"  style="width: 80%" class=" table table-bordered"></table></td></tr><tr><td><table width="40%" class="display1" id="example" cellspacing="0"></table></td></tr></table></div>-->
+
+					<div id="QueryResult"><div id="example_wrapper" class="dataTables_wrapper no-footer"><div class="dataTables_length" id="example_length"><label >Show <select name="example_length" aria-controls="example" class=""><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label></div><div id="example_filter" class="dataTables_filter"><label>Search:<input type="search" class="" placeholder="" aria-controls="example"></label></div><div class="dataTables_scroll"><div class="dataTables_scrollHead" style="overflow: hidden; position: relative; border: 0px; width: 100%;"><div class="dataTables_scrollHeadInner" style="box-sizing: content-box; width: 738px; padding-right: 0px;"><table cellspacing="0" style="width: 738px; margin-left: 0px;" class="table table-bordered dataTable no-footer" role="grid"><thead><tr id="thd" role="row"><th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 340px;" aria-sort="ascending" aria-label="Comp: activate to sort column descending">Company ID</th><th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: 360px;" aria-label="Vendy: activate to sort column ascending">Vendor Name</th></tr></thead></table></div></div><div class="dataTables_scrollBody" style="position: relative; overflow: auto; width: 100%;"><table id="example" cellspacing="0" style="width: 100%;" class="table table-bordered dataTable no-footer" role="grid" aria-describedby="example_info"><thead><tr role="row" style="height: 0px;"><th class="sorting_asc" aria-controls="example" rowspan="1" colspan="1" style="width: 340px; padding-top: 0px; padding-bottom: 0px; border-top-width: 0px; border-bottom-width: 0px; height: 0px;" aria-sort="ascending" aria-label="Comp: activate to sort column descending"><div class="dataTables_sizing" style="height:0;overflow:hidden;">Comp</div></th><th class="sorting" aria-controls="example" rowspan="1" colspan="1" style="width: 360px; padding-top: 0px; padding-bottom: 0px; border-top-width: 0px; border-bottom-width: 0px; height: 0px;" aria-label="Vendy: activate to sort column ascending"><div class="dataTables_sizing" style="height:0;overflow:hidden;">Vendy</div></th></tr></thead><tbody><tr role="row" class="odd"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="even"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="odd"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="even"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="odd"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="even"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="odd"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="even"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="odd"><td class="sorting_1">10</td><td>5592</td></tr><tr role="row" class="even"><td class="sorting_1">10</td><td>5592</td></tr></tbody></table></div></div><div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing 1 to 10 of 15 entries</div><div class="dataTables_paginate paging_simple_numbers" id="example_paginate"><a class="paginate_button previous disabled" aria-controls="example" data-dt-idx="0" tabindex="0" id="example_previous">Previous</a><span><a class="paginate_button current" aria-controls="example" data-dt-idx="1" tabindex="0">1</a><a class="paginate_button " aria-controls="example" data-dt-idx="2" tabindex="0">2</a></span><a class="paginate_button next" aria-controls="example" data-dt-idx="3" tabindex="0" id="example_next">Next</a></div></div></div>
+				<div id="QueryResult">
+							
+							</div>
+						</div>
+				</div>
+				<br>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="row btn-grp" >
+								<a type="button" id="exportButton"
+									class="seriesBtns btn btn-default"
+									style="  background: #08C;color: white;float: right;margin-right: 9.2%;text-align: center;font-size: 11pt;margin-top: 1%; ">Export as Excel</a>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	&emsp;&emsp;&emsp;
+	<div id="footer"></div>
+</body>
+
+
+<script>
+	$(document).ready(function() {
+		$('#next-column').click(function(event) {
+			event.preventDefault();
+			$('.table-container').animate({
+				scrollLeft : '+=282'
+			}, 'slow');
+		});
+		$('#previous-column').click(function(event) {
+			event.preventDefault();
+			$('.table-container').animate({
+				scrollLeft : '-=282'
+			}, 'slow');
+		});
+		$('#1').click(function(event) {
+			event.preventDefault();
+			$('.table-container').animate({
+				scrollLeft : '+-=282'
+			}, 'slow');
+		});
+		$('#2').click(function(event) {
+			event.preventDefault();
+			$('.table-container').animate({
+				scrollLeft : '+=282'
+			}, 'slow');
+		});
+	});
+</script>
+
+<!-- <script type="text/javascript">
+	$("#exportButton").click(function() {
+		var selectValue = $("#selecttype option:selected").text();
+
+		if (selectValue == "PDF") {
+			getPDFFile();
+		} else if (selectValue == "WORD") {
+			getWORDFile();
+		} else {
+			getEXCELFile();
+		}
+	});
+</script> -->
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+
+<script>
+	function getPDFFile() {
+		var pdf = new jsPDF('p', 'pt', 'letter');
+		source = $('#QueryResult')[0];
+		/* pdf.canvas.height = 72 * 11;
+		pdf.canvas.width = 72 * 8.5; */
+
+		pdf.fromHTML(source);
+
+		pdf.save('Report.pdf');
+	};
+</script>
+
+<script>
+	$("#exportButton").click(function() {
+
+		var ReportNames = localStorage.getItem('reportsData');
+		var event = JSON.parse(ReportNames);
+		var Reportname = event[0].report_name;
+
+		var data_type = 'data:application/vnd.ms-excel';
+		var table_div = document.getElementById('QueryResult');
+		var table_html = table_div.outerHTML.replace(/ /g, '%20');
+
+		var a = document.createElement('a');
+		a.href = data_type + ', ' + table_html;
+		/* a.download = 'table_div'
+				+ Math.floor((Math.random() * 9999999) + 1000000) + '.xls'; */
+
+		a.download = Reportname + '.xls';
+
+		a.click();
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- <script>
+	$(document).ready(function() {
+		
+		var data = localStorage.getItem('generatedquery');
+		
+		 $.ajax({
+		url : SERVER_URL+'/runExecutefinaQuery',
+		type : 'POST',
+		data : data,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+
+			//alert("success" + JSON.stringify(data));
+			data = data.returnData;
+
+			
+
+			console.log(data);
+			bindreporttoexcel(data);
+			//localStorage.setItem('queryOutput', JSON.stringify(data));
+			//var finalqueryOutput = localStorage.getItem('queryOutput');
+		//alert("finalqueryOutput" + finalqueryOutput);
+			//window.open('10.html', '_self');
+			//window.location.href('10.html');
+		}
+	}); 
+		
+		
+		
+		
+		/* var Queryvalues = localStorage.getItem('queryOutput');
+		//pase the value 
+		var finalQueryvalues = JSON.parse(Queryvalues);
+		alert("oooooo"+finalQueryvalues);
+		bindreporttoexcel(finalQueryvalues); */
+	});
+
+	function bindreporttoexcel(finalQueryvalues) {
+		var arr = finalQueryvalues;
+		//alert("pppp"+arr);
+		var table = "<html><table class='table table-bordered'>";
+
+		if (arr.length > 0) {
+			var col = [];
+			for ( var key in arr[0]) {
+				if (col.indexOf(key) === -1) {
+					col.push(key);
+				}
+			}
+		}
+
+		for (i = 0; i < col.length; i++) {
+			table = table + "<th>" + col[i] + "</th>";
+		}
+
+		for (j = 0; j < arr.length; j++) {
+
+			table = table + "<tr>";
+
+			for (i = 0; i < col.length; i++) {
+				table = table + "<td>" + arr[j][col[i]] + "</td>";
+			}
+			table = table + "</tr>";
+		}
+		table += "</table></html>";
+		document.getElementById("QueryResult").innerHTML = table;
+	}
+</script> -->
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<!--Data Table-->
+<script type="text/javascript" src="./js/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"></script>
+<script>
+	function createGrid(data) {
+		//alert("In Create Gridsdasdas");
+		//data = '[{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"}, {"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"}, {"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":169419,"id":"PH"},{"product description":"                         ","vendor id":"VM","sequence id":123456,"id":"PH"}]';
+		//data = JSON.parse(data);
+		/*
+		console.log(data);
+		
+		if (data.length > 0) {
+			var col = [];
+				for ( var key in data[0] ) {
+					console.log(data[0][key]);
+					for(var k in data[0][key]) {					
+						if (col.indexOf(k) === -1) {
+							col.push(k);
+						}					
+					}				
+				}		
+		}*/
+		console.log(data);
+		if (data.length > 0) {
+			var col = [];
+			//document.getElementById("example").innerHTML += "<tr>";
+			for ( var key in data[0]) {
+				if (col.indexOf(key) === -1) {
+					col.push(key);
+					//document.getElementById("example").innerHTML += "<th>"+ key +"</th>";
+				}
+			}
+			//document.getElementById("example").innerHTML += "</tr>";
+		}
+		dispCols = [];
+		console.log(col);
+
+		for (i = 0; i < col.length; i++) {
+			var jsonObj = {};
+			jsonObj.data = col[i];
+			jsonObj.title = col[i];
+			dispCols.push(jsonObj);
+		}
+
+		console.log(dispCols);
+
+		var t1 = $("#example").DataTable({
+			paging : true,
+			select : "multi",
+			searching : true,
+			info : true,
+			scrollX : true,
+			data : data,
+			columns : dispCols
+		});
+
+		document.getElementById("exportButton").style.display = "block";
+	}
+	$("#header").load("header.html");
+	$("#footer").load("footer.html");
+</script>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Show Table List</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="Style.css">
+  <script>
+    var tablearr = [];
+    var selectedarr = [];
+    var inputarr = [];
+    var tmpinputarr = [];
+  </script>
+  <script>
+    function checkbox(checkboxchecked="", checkboxname="") {
+      if (document.getElementById(checkboxchecked).checked) {
+        localStorage.setItem("ReportNameClicked", checkboxname);
+        return true;
+      }
+      return false;
+    }
+  </script>
+</head>
+<body>
+<div id="header"></div>
+<div class="container">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading"><b> Display Tables </b></div> 
+    <div class="panel-body">
+      <h2 class="text-center"><b>Tables List</b></h2>
+     <!--  <h5>Select Organization</h5><select id='menuHandler' class="form-control" onchange="news();newc();"></select> -->
+       <!-- <h4 class="text-center">Reports Name List</h4> 
+       <h4 class="text-left">Available Reports</h4>
+        <h4 class="text-right">Assigned Reports</h4> -->
+      <div class="row">
+        <div class="col-md-6">
+          <div id="tdname"></div>
+        </div>
+      </div>             	  
+      <!-- <div class="row btn-grp" style="margin-top: 15px;text-align: center">
+        <a type="button" value="Assign" class="btn btn-primary" id="content"  onclick="function();" href="#">Assign</a>
+      </div> -->
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+</body>
+<script>
+function bindTableData2(data){
+  var arr = data.returnData;
+ // alert(arr);
+tmpstr =  "<table class=\"table table-bordered\">";
+
+ tmpstr = tmpstr + "<th></th>" + "<th>" + "Table Names "  + "</th>" ;
+ if(arr!=null){
+for(var i=0;i<arr.length;i++)
+{  
+str = '<tr><td><input type="checkbox" class="tabId" value="'+arr[i].report_id+""+arr[i].org_id+'" /></td>';
+tmpstr += str + '<td>' + arr[i].tablename +'</td></tr>';	
+
+}	
+
+ }
+ else{
+     alert("report names are not found");
+    }	
+document.getElementById("tdname").innerHTML = tmpstr;
+} 
+$(document).ready(function () 
+{	 	
+	//alert("hiii");
+	 var jsonObjToSend={};
+	 //jsonObjToSend['idd']=JSON.stringify(iddd);
+	 
+	
+	 /* jsonObjToSend['report_id']=localStorage.getItem("report_id");
+	 jsonObjToSend['org_id']=localStorage.getItem("orgiD");*/
+	 jsonObjToSend['org_report_id']=localStorage.getItem("org_report_iD");
+	  
+	
+	console.log(jsonObjToSend);
+	 // alert(jsonObjToSend);
+	 
+	 
+
+
+$.ajax({
+    url: './OrganizationService/GetOrgReportTables',
+    type: 'POST',
+    dataType: 'json',
+    contentType : "application/json ; charset=utf-8",
+    data: JSON.stringify(jsonObjToSend),
+    success: function (data, textStatus, xhr) {
+    	//alert(JSON.stringify(data));
+     
+       console.log(data);
+      bindTableData2(data);       
+    },
+    error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+    }
+});		  
+}); 
+
+</script>
+
+
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</html>

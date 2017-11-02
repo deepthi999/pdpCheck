@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	
+	
+
+<link rel="stylesheet" href="Style.css">
+<script type="text/javascript" src=".\js\highchecktree.js"></script>
+<script type="text/javascript" src=".\js\filters.js"></script>
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css"
+	rel="stylesheet" type="text/css">
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans'
+	rel='stylesheet' type='text/css'>
+
+</head>
+<style>
+.clickable{
+text-decoratioon:none;
+}
+.clickable:hover{
+text-decoration:underline;
+}
+#thd{
+background-color:#0088cc;
+color:white;
+}
+</style>
+
+<body>
+<div id="header"></div>
+<div class="container">
+
+<div class="panel panel-default panel-box">
+    <div class="panel-heading" style="text-align: center">
+    <table align="center">
+   <tr>
+   <td><b style="font-size:20px;">Organization Name:</b></td>
+   <td><b style="font-size:20px;">PROTO BPCS</b></td>
+   </tr>
+   <tr>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report Name:</b></td>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;General Reports</b></td>
+   </tr>
+   </table>
+    </div>
+    <div class="panel-body">
+      <h2 class="text-center"><b>Query Preview</b></h2>
+      <textarea id="txtArea" class="form-control" disabled rows="10" cols="80" name="ReportDescription">
+	  SELECT aph.APHID "aph.APHID",apl.PLID "apl.PLID"
+                                  FROM  gts_amr_pueblabpcs.aph aph
+												LEFT OUTER JOIN gts_amr_pueblabpcs.apl apl  ON aph.APHID=apl.PLID
+    						where aph.APHID = :param_aph.APHID: And aph.APHID = :param_aph.APHID:</textarea>
+      <!--<div class="row btn-grp" style="margin-top: 15px;text-align: center">
+        <a type="button" class="btn btn-primary" id="btnsave">Validate</a>
+        <a type="button" class="btn btn-primary" href="3.html">Prev</a>
+        <a type="button" class="btn btn-primary" id="btnRun" href="#">Next</a>
+       
+      </div>-->
+    </div>
+  </div>
+<body>
+
+<h4>Existing Joins </h4>
+<div class="row">
+<div class="col-md-10 col-sm-10">
+<table class="table table-bordered">
+    <thead>
+	<tr>
+	<th id="thd">Table 1 Name</th>
+	<th id="thd">Join condition</th>
+	<th id="thd">Table 2 Name</th>
+	<th id="thd">Query</th>
+	<th id="thd">Logical Operator</th>
+	<th id="thd">Delete</th>
+	</tr>
+      <tr>
+        <tbody>
+		<tr>
+        <td>aph</td>
+        <td>LEFT OUTER JOIN</td>
+        <td>apl</td>
+        <td>ON aph.APPORD=aph.APHID</td>
+        <td>AND</td>
+        <td><img height="30px" src="./images/del.png"></td>
+      </tr>
+	  </tbody>
+    </thead>
+   
+  </table>
+</div>
+<div class="col-md-2 col-sm-2">
+<input type="button" class="btn btn-primary" value="+"
+									onclick=" GenerateQuery(); CheckAlias();" data-toggle="tooltip" title="add query" style="width:100px;float:right;margin-left:15px;margin-right:65px;margin-top:25px"> </input>
+</div>
+</div>
+
+				
+				
+		<h4>Existing Filters </h4>
+		<div class="row">
+        <div class="col-md-10 col-sm-10">
+		<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th id="thd">Filter Label</th>
+        <th id="thd">Filter Type</th>
+        <th id="thd">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Vendor Name</td>
+        <td>Text</td>
+        <td><img height="30px" src="./images/del.png" ></td>
+      </tr>
+      <tr>
+        <td>Product ID</td>
+        <td>Text</td>
+        <td><img height="30px" src="./images/del.png" ></td>
+      </tr>
+      
+    </tbody>
+  </table>
+  </div>
+  <div class="col-md-2 col-sm-2">
+   <button class="btn btn-primary" id="opt_selbtn" onclick="addFilter()" style="width:100px;margin-top:25px;">+</button>	
+  </div>
+  </div>
+  
+  <div class="row" >		
+    	<div class="col-md-10 col-sm-10">
+      <textarea id="wherecondition" rows="6" cols="131" name="ReportDescription"		
+				placeholder="WHERE t2.Column2 IN (10, 20, 30)		
+         		AND t3.Column9 = OPEN"	></textarea>
+			</div>
+			</div>
+	
+ <!-- button class="btn btn-primary" style="width:100px;margin-right:20px;float:right;background-color:#0088c">Customize</button>  -->
+ <a href="custimized_report.html" class="btn btn-primary" style="width:100px;margin-right:20px;float:right;background-color:#0088c">Run Report</a>
+ <br>
+ <br>
+</div>
+<div id="footer"></div>
+</body>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>

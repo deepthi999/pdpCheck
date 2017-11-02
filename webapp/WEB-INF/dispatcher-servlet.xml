@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                            ">
+
+	<context:component-scan
+		base-package="com.controllers,com.service,com.serviceImpl,com.ClientLayer" />
+	<!-- <context:component-scan base-package="com.controllers,com.service,com.serviceImpl,com.ClientLayer.Controllers,com.ClientLayer.Dao,com.ClientLayerDaoImpl,com.ClientLayerService,com.ClientLayer.ServiceImpl" 
+		/> -->
+	<!-- <import resource="/spring-security.xml "/> -->
+	<mvc:annotation-driven />
+
+	<mvc:cors>
+		<mvc:mapping path="/info/**"
+			allowed-origins="http://localhost:8085, http://localhost:8787"
+			allowed-methods="POST, GET, PUT, OPTIONS, DELETE" allowed-headers="X-Auth-Token, Content-Type"
+			exposed-headers="custom-header1, custom-header2" allow-credentials="false"
+			max-age="4800" />
+	</mvc:cors>
+
+	<context:annotation-config />
+	<mvc:resources mapping="/**" location="classpath:/resources/,/" />
+	
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsps" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<context:property-placeholder location="WEB-INF/database.properties" />
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
+		destroy-method="close"> -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${database.driver}</value>
+		</property>
+		<property name="url">
+			<value>${database.url}</value>
+		</property>
+		<property name="username">
+			<value>${database.username}</value>
+		</property>
+		<property name="password">
+			<value>${database.password}</value>
+		</property>
+		<!-- <property name="maxActive"><value>${database.maxactiveconnections}</value></property> 
+			<property name="maxIdle"><value>${database.idleconnections}</value></property> 
+			<property name="initialSize"><value>${database.initialSize}</value></property> -->
+	</bean>
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName"><value>${database.driver}</value></property> 
+		<property name="url"><value>${database.url}</value></property> <property 
+		name="username"><value>${database.username}</value></property> <property 
+		name="password"><value>${database.password}</value></property> </bean> -->
+
+
+
+	<bean id="empSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="/WEB-INF/mybatis-config.xml" />
+	</bean>
+
+	<bean id="ReportMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="empSessionFactory" />
+		<property name="mapperInterface" value="com.mybatis.mappers.ReportMapper" />
+	</bean>
+	<!-- new code -->
+	<!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> <property 
+		name="basePackage" value="com.mybatis.mappers.ReportMapper" /> <property 
+		name="sqlSessionFactory" ref="empSessionFactory"></property> </bean> -->
+	<!-- Organization -->
+
+	<bean id="orgSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="/WEB-INF/mybatis-config.xml" />
+	</bean>
+
+	<bean id="OrganizationMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="orgSessionFactory" />
+		<property name="mapperInterface" value="com.mybatis.mappers.OrganizationMapper" />
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="clientdataSource" />
+	</bean>
+
+	<bean id="clientdataSource" class="org.apache.commons.dbcp.BasicDataSource" 
+		destroy-method="close">
+		
+		<property name="driverClassName">
+			<value>${cdatabase.driver}</value>
+		</property>
+		<property name="url">
+			<value>${cdatabase.url}</value>
+		</property>
+		<property name="username">
+			<value>${cdatabase.username}</value>
+		</property>
+		<property name="password">
+			<value>${cdatabase.password}</value>
+		</property>
+
+
+	</bean>
+	<bean id="springSecurityFilterChain" class="org.springframework.web.filter.DelegatingFilterProxy" />
+
+    <!-- Configure the entity manager factory bean
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.model"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    Configure the transaction manager bean
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    Enable annotation driven transaction management
+    <tx:annotation-driven/>
+
+    
+      Configure Spring Data JPA and set the base package of the
+      repository interfaces
+   
+
+    <jpa:repositories base-package="com.repository"/> -->
+
+</beans>

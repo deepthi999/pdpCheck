@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+  
+
+<mapper namespace='com.mybatis.mappers.OrganizationMapper'>
+
+
+  <select resultType="java.util.HashMap" parameterType="java.util.Map" id="show_organization" fetchSize="25">
+     CALL spGetOrgList();
+    </select>
+    
+     <select resultType="java.util.HashMap" parameterType="java.util.Map" id="show_Reports" fetchSize="25">
+     select report_name,report_id from sunset.mt_reports;
+    </select>
+    
+     <select resultType="java.util.HashMap" parameterType="java.util.Map" id="show_selectOrganization" fetchSize="25">
+   
+      SELECT sunset.mt_organization.org_name,sunset.mt_reports.report_name,sunset.mt_reports.report_id,sunset.mt_organization.org_id,sunset.mt_org_reports.org_report_id
+     FROM sunset.mt_organization INNER JOIN sunset.mt_org_reports ON 
+     sunset.mt_organization.org_id=sunset.mt_org_reports.org_id INNER JOIN 
+     sunset.mt_reports ON sunset.mt_org_reports.report_id=sunset.mt_reports.report_id
+     where sunset.mt_organization.org_id=#{org_id};   
+    </select>
+    
+     <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Show_no_of_reports" fetchSize="25">
+     select count(report_name) as  report_name from  sunset.mt_reports;
+    </select>
+    
+    <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Show_no_of_Organization" fetchSize="25">
+     select count(org_name)  as org_name from  sunset.mt_organization;
+    </select>
+    
+    <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Show_no_of_users" fetchSize="25">
+     select count(user_name) as user_name from  mt_user;
+    </select>
+    
+    <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Show_no_of_Categories" fetchSize="25">
+     select count(report_category_name) as report_category_name from  sunset.mt_report_categories;
+    </select>
+    
+     <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Organization_to_Reports" fetchSize="25">
+     select count(org_report_id)  as org_report_id from  sunset.mt_org_reports;
+    </select>
+    
+     <select id="AssignOrgReport" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+       CALL spAssignOrgReport(${org_id},${report_id});
+      </select>
+      
+     <select resultType="java.util.HashMap" parameterType="java.util.Map" id="Selected_organization_reports" fetchSize="25">
+    SELECT report_name, report_id FROM sunset.mt_reports WHERE sunset.mt_reports.report_id NOT IN (SELECT report_id FROM sunset.mt_org_reports
+     where sunset.mt_org_reports.org_id=#{org_id});
+     
+    </select>
+       
+     
+     <select id="show_noof_Organization" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgName(${org_id});
+       
+     </select>
+     
+     
+     <select id="GetOrgReportTables" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+ 
+       Call spGetOrgReportTables(${org_report_id});  
+ 
+        </select> 
+     
+     <select id="UpdateOrgReportTables" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportTables(${org_report_id},${table_id},${table_alias});
+       
+     </select>
+     
+     <select id="UpdateOrgReportParameters" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportParameters(${org_report_id},${criteria_id},${param_id},${param_name},${param_label},${param_type},${param_query},${is_multi},${quotes_enclosed},${seq});
+       
+     </select>
+     
+     <select id="UpdateOrgReportJoins" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportJoins(${org_join_id},${org_report_id},${table_1_id},${join_type},${table_2_id},${join_condition});
+       
+     </select>
+     
+     <select id="UpdateOrgReportFields" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportFields(${org_report_id},${table_id},${field_id},${field_label},${aggregate_field},${aggregator},${sort_position});
+       
+     </select>
+     
+     <select id="UpdateOrgReportField" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportField(${org_id},${report_id},${field_id},${field_name},${field_label});
+       
+     </select>
+     
+     
+     <select id="UpdateOrgReportCriteria" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spUpdateOrgReportCriteria(${criteria_id},${org_report_id},${criteria});
+       
+     </select>
+     
+     
+     <select id="RemoveOrgReportTables" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spRemoveOrgReportTables(${org_report_id},${table_id});
+       
+     </select>
+     <select id="RemoveOrgReportCriteria" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spRemoveOrgReportCriteria(${org_report_id},${org_criteria_id});
+       
+     </select>
+     
+     <select id="RemoveOrgReportField" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spRemoveOrgReportField(${org_id},${report_id},${field_id});
+       
+     </select>
+     
+     
+     <select id="InsertOrganization" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spInsertOrganization(${org_name});
+       </select>
+       
+       
+       <select id="GenerateOrgReport" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGenerateOrgReport(${org_report_id});
+       
+     </select>
+     
+     
+     
+     <select id="GetOrgReportJoins" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgReportJoins(${org_report_id});
+       
+     </select>
+     
+     
+     <select id="GetOrgReportFields" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgReportFields(${org_report_id},${table_id});
+       
+     </select>
+     
+     
+     <select id="GetOrgReportCriteria" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgReportCriteria(${org_report_id},${org_criteria_id});
+       
+     </select>
+     
+     
+     <select id="GetOrgReportParameters" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgReportParameters(${org_report_id},${criteria_id});
+       
+     </select>
+     
+      <select id="GetOrgReportCriteriaByReportId" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call spGetOrgReportCriteriaByReportId(${org_report_id});
+       
+     </select>
+     
+      <select id="fnGetOrgFromList" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >    
+      Call fnGetOrgFromList(${schema_name},${org_report_id});
+       
+     </select>
+     
+      
+    
+    
+     </mapper>

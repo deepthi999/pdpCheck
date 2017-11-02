@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	
+	<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="Style.css">
+<script type="text/javascript" src=".\js\highchecktree.js"></script>
+<script type="text/javascript" src=".\js\filters.js"></script>
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css"
+	rel="stylesheet" type="text/css">
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans'
+	rel='stylesheet' type='text/css'>
+
+</head>
+
+<style>
+.clickable{
+text-decoratioon:none;
+}
+.clickable:hover{
+text-decoration:underline;
+}
+#thd{
+background-color:#0088cc;
+}
+</style>
+
+
+
+<script  type="text/javascript">
+var  org_id;
+var  report_id;
+var ReportNames = localStorage.getItem('orgnameid');
+var event = JSON.parse(ReportNames);
+var Reportname = event.report_name;
+var org_report_id = event.org_report_id;
+  org_id = event.org_id;
+  report_id = event.report_id;
+	
+	
+function verifying() {
+	org_id;
+	report_id;
+	 ReportNames = localStorage.getItem('orgnameid');
+	 event = JSON.parse(ReportNames);
+	 Reportname = event.report_name;
+	 org_report_id = event.org_report_id;
+		/*  org_report_id = event.org_report_id;
+		  org_id = event.org_id;
+		  report_id = event.report_id; */
+		
+		/* alert("ORG_ID"+ org_id);
+		alert("REPORT_ID"+ report_id); */
+		
+		document.getElementById("spantext").innerHTML = Reportname;
+		
+		
+		
+		var OrganizationName = localStorage.getItem('OrganizationName');
+		
+		document.getElementById("OrganizationName").innerHTML = OrganizationName;
+		
+		
+		//To Fetche Already inserted Conditions
+		
+		//this.getWhereCondition(report_id);
+		//this.bindFilterParams();
+		
+		var data= "{org_report_id:"+ org_report_id + "}";
+		//alert(data);
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GenerateOrgReport' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+			
+				//alert("qqqq"  +JSON.stringify(data));
+				data = data.returnData;
+			
+				var Reportname = data[0].v_sql;
+				document.getElementById("txtArea").innerHTML = Reportname;
+				
+				/* data = data.replace(/\s+/g, " ");
+				  data = data.replace(/"/g, "'");			//to Replace with single quotes in plcae of "
+				data = "{" + "\"query\"" + ":\"" + data + "\"}";
+				alert("bbbbb"+data); */
+				
+			}
+		});
+		
+		
+		var data= "{org_report_id:"+ org_report_id + "}";
+		
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GetOrgReportTables' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+				//data = data.returnData;
+				
+			
+				//alert("tbs"  +JSON.stringify(data));
+				
+				bindTableData(data)
+				/* data = data.replace(/\s+/g, " ");
+				  data = data.replace(/"/g, "'");			//to Replace with single quotes in plcae of "
+				data = "{" + "\"query\"" + ":\"" + data + "\"}";
+				alert("bbbbb"+data); */
+				
+			}
+		});
+		
+		function bindTableData(data){
+			  var arr = data.returnData;
+			 // alert(arr);
+			tmpstr =  "<table class=\"table table-bordered\">";
+
+			 tmpstr = tmpstr +  "<th>" + "Table Name "  + "</th>" +"<th>"+"Delete"+"</th>" ;
+			 if(arr!=null){
+			for(var i=0;i<arr.length;i++)
+			{  
+				 str = "<td data-toggle='collapse' data-target=''#OrgReportFields' class='clickable' ><img height='30px' src='./images/del.png' onClick='getorgaliasss("
+						 
+				//str = "<td data-toggle='collapse' data-target=''#OrgReportFields_'"+ arr[i].org_report_table_id +"class='clickable' ><img height='30px' src='./images/del.png' onClick='getorgalias("	 
+						+ arr[i].org_report_id
+						+ ", "
+						+ arr[i].table_id
+						
+						+ ");'></img></td>";
+			tmpstr +=  '<tr><td data-toggle="collapse" data-target="#OrgReportFields_'+ arr[i].org_report_table_id +'" class="clickable"  onClick="getorgalias('+ arr[i].org_report_id+  ", "
+			+ arr[i].org_report_table_id + ", "
+			+ arr[i].table_id
+			+' ); " >' + arr[i].tablename +'   </td>'+str+'</tr>';	
+			tmpstr += '<tr><td colspan="3" ><div id="OrgReportFields_'+ arr[i].org_report_table_id +'" class="collapse"></div></td></tr>';
+			//tmpstr+="</tr>";
+			alert("tmpstr" + tmpstr);
+			}	
+
+			 }
+			 else{
+			     alert("report names are not found");
+			    }	
+			document.getElementById("tables").innerHTML = tmpstr;
+			} 
+		
+		
+		
+	}
+	
+function getorgaliasss(org_report_id,table_id){
+	alert("hi");
+	 alert(org_report_id);
+     alert(table_id);
+     data = {};
+ 	data.org_report_id = org_report_id;	
+ 	data.table_id = table_id;
+ 	alert(JSON.stringify(data));
+	data1 = JSON.stringify(data);
+	alert(data1);
+	
+	$.ajax({
+		url : './OrganizationService/RemoveOrgReportTables',
+		type : 'POST',
+		data : data1,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+			alert("HIII");
+			console.log(data);
+			alert(JSON.stringify(data));
+			verifying(data);
+			
+	     var x = document.getElementById('tables');
+			x.style.display = 'block'; 
+		}
+	});
+ 	
+}
+
+	
+	
+function getorgaliass(orgid,reportid,field_id){
+	
+	report_id;
+	org_id;
+	/*  alert(report_id);
+	alert(org_id);
+	alert(field_id);  */	
+	data = {};
+	data.org_id = org_id;	
+	data.report_id = report_id;
+	data.field_id = field_id;	
+	//alert(JSON.stringify(data));
+	data1 = JSON.stringify(data);
+	//alert(data1);
+	
+	$.ajax({
+		url : './OrganizationService/RemoveOrgReportField',
+		type : 'POST',
+		data : data1,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+			//alert("HIII");
+			console.log(data);
+			//alert(JSON.stringify(data));
+			verifying(data);
+			
+	     var x = document.getElementById('OrgReportFields_');
+			x.style.display = 'block'; 
+		}
+	});
+	
+}
+
+</script>
+
+
+<script type="text/javascript">
+
+function getorgalias(org_report_id, org_report_table_id,table_id) {
+	data = {};
+	data.org_report_id = org_report_id;
+	data.table_id = table_id;
+	
+	//alert("TO be :" + JSON.stringify(data));
+	data = JSON.stringify(data);
+	 $.ajax({
+		url : './OrganizationService/GetOrgReportFields',
+		type : 'POST',
+		data : data,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+			console.log(data);
+			//bindFilterParams(data);
+			
+	    	//alert("alias" +JSON.stringify(data));
+	    	bindTableDataalias(data, org_report_table_id);
+		}
+	}); 	 
+		function bindTableDataalias(data,org_report_table_id){
+			  var arr = data.returnData;
+			  
+			tmpstr =  "<table class=\"table table-bordered\">";
+
+			 tmpstr = tmpstr +  "<th>" + "Column Name "  + "</th>" + "<th>" + "Alias Name"+ "</th>" +"<th>"+"Edit"+"</th>"+"<th>"+"Delete"+"</th>" ;
+			 if(arr!=null){
+			for(var i=0;i<arr.length;i++)
+			{  
+  str = "<td data-toggle='collapse' data-target=''#OrgReportFields' class='clickable' ><img height='30px' src='./images/del.png' onClick='getorgaliass("+org_id+" ,"+report_id+" ,"+ arr[i].field_id +");'></img></td>";	
+   upr="<td >"+"<span class='glyphicon glyphicon-pencil' id='text' onClick=getorgedit()></span>"+"</td>";	
+  
+				s="<td>" + arr[i].field_label+ "</td>";					
+			tmpstr += '<tr><td >' + arr[i].field_name +'</td>'+ s+upr
+								tmpstr +=  str+'</tr>';			
+			}	
+			 }
+			 else{
+			     alert("report names are not found");
+			    }	
+			 
+				document.getElementById("OrgReportFields_"+org_report_table_id).innerHTML = tmpstr;
+			} 	 		
+}
+</script>
+
+<script>
+function getorgedit(){
+	alert("hii");
+	
+}
+</script>
+
+<body onload="verifying();">
+<div id="header"></div>
+<div class="container">
+
+<div class="panel panel-default panel-box">
+
+
+	<div class="panel-heading" style="text-align: center"> 
+    <b style=" font-size: 20px;">Organization Name: </b> &nbsp <b><span style=" font-size: 20px;" id="OrganizationName"></span></b><br>
+  
+    
+    <b style=" font-size: 20px;">&nbsp&nbsp&nbsp&nbsp&nbsp  Report Name: </b>&nbsp <b><span style=" font-size: 22px;" id="spantext"></span></b>
+     </div>
+    
+    <div class="panel-body">
+      <h2 class="text-center"><b>Query Preview</b></h2>
+      <textarea id="txtArea" class="form-control" disabled rows="10" cols="80" name="ReportDescription">
+	 </textarea>
+      <!--<div class="row btn-grp" style="margin-top: 15px;text-align: center">
+        <a type="button" class="btn btn-primary" id="btnsave">Validate</a>
+        <a type="button" class="btn btn-primary" href="3.html">Prev</a>
+        <a type="button" class="btn btn-primary" id="btnRun" href="#">Next</a>
+       
+      </div>-->
+    </div>
+  </div> 
+  <div class="table" id="tables"></div>
+   <!--  <div id="OrgReportFields" class="table table-bordered"></div> -->
+<div class="bu_tton">
+<button class="btn btn-primary" style="width: 100px;margin-buttom:10%;float:right;"><a href="CustomizedReport3.html" style="color: white;">Next</a></button>		
+          <!--<input class="btn btn-primary form-group" value="Next" id="btnSave" href="CustomizedReport2.html" style="width: 100px;margin-right: 20px;" type="submit">-->
+</div>
+</div>
+<div id="footer" style="margin-top: 4%;"></div>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+<script>
+$('.collapse').on('show.bs.collapse', function () {
+    $('.collapse.in').collapse('hide');
+});
+</script>
+</body>
+</html>

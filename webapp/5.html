@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Report Customization</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="Style.css">
+
+ <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+function verifying()
+{
+	var ReportName =localStorage.getItem('Custom1');
+	document.getElementById("Custom1").innerHTML=ReportName;
+
+	var ReportName =localStorage.getItem('Custom2');
+	document.getElementById("Custom2").innerHTML=ReportName;
+
+
+	var Alias =localStorage.getItem('Alias1');
+	document.getElementById("Alias1").innerHTML=Alias;
+	var Alias =localStorage.getItem('Alias2');
+	document.getElementById("Alias2").innerHTML=Alias;
+
+
+
+
+	var ReportClicked = localStorage.getItem('ReportNameClicked');
+	if(ReportClicked !=null)
+	{
+		document.getElementById("spantext").innerHTML = ReportClicked;
+	}
+}
+</script>
+
+</head>
+<body  onload="verifying();">
+<div id="header"></div>
+
+<div class="container">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading"><b>Report Name :</b> <span id="spantext"></span></div>
+    <div class="panel-body">
+      <div id="tabs">
+        <div id="current">
+          <div id="table1">
+
+              <table class="table table-bordered" >
+                <tr>
+                  <th>Field Name (Display only)</th>
+                  <th>Sort Order (Editable)</th>
+                  <th>Alias (Editable)</th>
+                </tr>
+                <tbody>
+                <tr>
+                  <td >t1.Column1 </td>
+                  <td>
+                    <a href="#" onclick="myFunction()">1</a>
+                  </td>
+                  <td>
+                    <a href="#" onclick="myFunction()">Column1</a></td>
+                </tr>
+                <tr>
+                  <td>Column2</a></td>
+                  <td>
+                    <a href="#" onclick="myFunction()">2</a>
+                  </td>
+                  <td><a href="#" onclick="myFunction()">Column3</a></td>
+                </tr>
+                <tr>
+                  <td id="Custom1">fnGetTypeDescription(t1.type_id)</td>
+                  <td>
+                    <a href="#" onclick="myFunction()">3</a></td>
+                  <td>
+                    <a href="#" onclick="myFunction()" id="Alias1">TypeDesc</a></td>
+                </tr>
+                <tr>
+                  <td id="Custom2">Substring(t2.name, 10)</td>
+                  <td><a href="#" onclick="myFunction()">4</a></td>
+                  <td><a href="#" onclick="myFunction()" id="Alias2">ItemCode</a></td>
+                </tr>
+                <tr>
+                  <td>......</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+
+                <tr>
+                  <td>......</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                </tbody>
+              </table>
+
+            <div class="row btn-grp" style="margin-top: 15px;text-align: center">
+              <a type="button" class="btn btn-primary" href="3.html">Prev</a>
+              <a type="button" class="btn btn-primary" id="btnRun" href="">Next</a>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+<div id="footer"></div>
+<script>
+  $("tbody").sortable({
+    items: "> tr",
+    appendTo: "parent",
+    helper: "clone"
+  }).disableSelection();
+
+  $("#tabsTest ul li a").droppable({
+    hoverClass: "drophover",
+    tolerance: "pointer",
+    drop: function(e, ui) {
+      var tabdiv = $(this).attr("href");
+      $(tabdiv + " table tr:last").after("<tr>" + ui.draggable.html() + "</tr>");
+      ui.draggable.remove();
+    }
+  });
+</script>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</body>
+</html>

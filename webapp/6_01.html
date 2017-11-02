@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Show Reports List</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="Style.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script>
+    var tablearr = [];
+    var selectedarr = [];
+    var inputarr = [];
+    var tmpinputarr = [];              
+  </script>
+  <script>
+    function checkbox(checkboxchecked="", checkboxname="") {
+      if (document.getElementById(checkboxchecked).checked) {
+        localStorage.setItem("ReportNameClicked", checkboxname);
+        return true;
+      }
+      return false;
+    }       
+  </script>
+</head>
+<style>
+.addedRecently:before {
+    color: red;
+    content: '*';
+}
+</style>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="./js/utils/constants.js"></script>
+<script>
+	function LoadDoc() {	
+	}
+</script>
+<body  onload="LoadDoc();">
+<div id="header"></div>
+<div class="container">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading"><b>Report Mapping & Customization Screen (For Admin only) </b></div>
+    <div class="panel-body">
+      <h2 class="text-center"><b>Organization List</b>
+        </h2>   
+      <h5>Select Organization</h5><select id='menuHandler' class="form-control" onchange="news();newc();btn();"></select>    
+      <div class="row">
+        <div class="col-md-6">
+          <div id="tdname"></div>
+        </div>
+         <div class="col-md-6">
+           <div id="tableId"></div>           
+        </div>
+      </div>             	  
+     <div id="btnid"></div>
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+</body>
+<script type="text/javascript">
+  $(document).ready(function () {	  
+    var jsonObjToSend = {};
+    $.ajax({
+      url: './OrganizationService/show_organization',
+      type: 'POST',
+      dataType: 'json',
+      contentType: "application/json ; charset=utf-8",
+      data: JSON.stringify(jsonObjToSend),
+      success: function (data, textStatus, xhr) {
+       data = data.returnData;       
+        var ddlCustomers = $('#menuHandler');
+        ddlCustomers.empty().append('<option selected="selected">Please select</option>');
+        $.each(data, function () {
+       	 ddlCustomers.append($("<option></option>").val(this['org_id']).html(this['org_name']));
+        }); 
+        
+        
+        $('#menuHandler').on('change',function() {
+					var id = $('#menuHandler').val();
+					var name = $(	'#menuHandler :selected').text();
+                  //alert(name);
+					localStorage.setItem("OrganizationName",name);
+				});        
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+      }
+    });
+    
+  });
+ 
+function bindTableData1(data){
+	var arr = data.returnData;	  
+	tmpstr1 ="<div class='col-md-6' style='margin-bottom:5px;margin-top:41px;margin-left:-12px;font-size:20px'>"+"<b>"+"Available Reports"+"<b>"+"</div>";
+	tmpstr = tmpstr1+"<table class=\"table table-bordered\" id='example'>";
+	 tmpstr = tmpstr + "<th width='1%'></th>" + "<th>" + "Report Names "  + "</th>" ;
+	 if(arr!=null){
+		var newarray=[];
+		for(i = 0; i < arr.length; i++) {
+		var data = arr[i];						
+		newarray.push(arr[i].report_name);
+		  }		 
+		  newarray.sort();
+		  var newids=[];
+		  for(i = 0; i < newarray.length; i++) {
+				var data = newarray[i];		
+				for(j = 0; j < arr.length; j++) {					
+					if(arr[j].report_name == newarray[i]) {
+						newids.push(arr[j].report_id);
+					}
+				}				
+			}		
+		  
+		  
+	for(var i=0;i<newarray.length;i++)
+	{  
+	str = '<tr><td><input type="radio" name="cust" class="tabId" value="'+newids[i]+'" /></td>';
+	tmpstr += str + '<td>' + newarray[i] +'</td></tr>';
+	}	
+	 }
+	 else{
+	    // alert("report names are not found");
+	    }	
+	 
+	document.getElementById("tdname").innerHTML = tmpstr; 
+	}
+function news()
+{
+	var jsonObjToSend={};
+jsonObjToSend['org_id']=$('#menuHandler').val();
+
+$.ajax({
+    url: './OrganizationService/Selected_organization_reports',
+    type: 'POST',
+    dataType: 'json',
+    contentType : "application/json ; charset=utf-8",
+    data: JSON.stringify(jsonObjToSend),
+    success: function (data, textStatus, xhr) {
+     
+        console.log(data);
+      bindTableData1(data);       
+    },
+    error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+    }
+});		  
+} 
+	  function send_radiValue()
+	  {
+		  alert('Assigned Report successfully');
+		  var orgSelected = $('#menuHandler').val();	
+		 // alert(orgSelected);
+			 var values = $('input:radio:checked.tabId').map(function () {	
+				 var repID = this.value; 
+				 alert(repID);
+				 Insert_into_selectedreport_names(orgSelected,repID);					
+				}).get(); 
+			 
+			 news();newc();
+			 
+			/*  $('input[type=radio][name=cust]:checked').hide(); */
+			 }
+function Insert_into_selectedreport_names(orgID, repID){	
+	var jsonObjToSend = {};
+	//alert(jsonObjToSend);
+	jsonObjToSend['org_id']=orgID;	
+	jsonObjToSend['report_id']=repID;
+	var ins=JSON.stringify(jsonObjToSend);
+	alert("ins" + ins);
+	console.log("Insert_into_selectedreport_names" + ins);
+$.ajax({
+    url: './OrganizationService/AssignOrgReport',
+    type: 'POST',
+    dataType: 'json',
+    contentType : "application/json ; charset=utf-8",
+    data: JSON.stringify(jsonObjToSend),
+    success: function (data, textStatus, xhr) {
+    	
+        console.log(data);
+      },
+    error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+    }
+});		    
+};
+
+function bindTableData2(data){
+var arr = data.returnData;
+ var tmpstr1 = "<div class='col-md-6' style='margin-bottom:5px;margin-top:41px;margin-left:-13px;font-size:20px'>"+"<b>"+"Assigned Reports"+"<b>"+"</div>";
+var table=tmpstr1+"<html><table class='table table-bordered'>";
+var chk="<td>"+""+"</td>";
+  table=table+"<th>"+"Report Names"+"</th>" +"<th>"+"Customize" +"</th>";  
+  if(arr!=null){
+  var i; 
+ var newarray=[];
+ var getid=[];
+  for(i = 0; i < arr.length; i++) {
+	var data = arr[i];				
+	newarray.push(arr[i].report_name);
+	getid.push(arr[i].org_report_id);
+  }
+  newarray.sort();
+  
+  var newids=[];
+  for(i = 0; i < newarray.length; i++) {
+		var data = newarray[i];		
+		for(j = 0; j < arr.length; j++) {					
+			if(arr[j].report_name == newarray[i]) {
+				newids.push(arr[j]);
+			}
+		}				
+	}		
+  
+  
+  var max_of_array = Math.max.apply(Math, getid); 
+  for(i = 0; i < newarray.length; i++) {		
+   table=table+"<tr>";  
+   str = '<td><input class="btn" style="background-color:#0088CC;color: white; " type="button" value="Customize"  onclick="handleClick('+ newids[i].org_report_id  +' , \''+ newids[i].report_name +'\','+ newids[i].report_id  +' ,'+ newids[i].org_id +');"/></td>';
+    table=table+"<td>" + newarray[i] +"</td>"+str;
+ table=table+"</tr>"; 
+ }
+  }
+  else{
+   //alert("report name not found");
+  }
+
+table += "</table></html>";
+document.getElementById("tableId").innerHTML = table;
+ for(i = 0; i < arr.length; i++) {
+if (arr[i].org_report_id === max_of_array) {	
+	var req = arr[i].report_name;
+	 $('#tableId tr td:first-child:contains('+req+')').addClass('addedRecently');	
+        }
+ }
+}
+function newc()
+{	
+ var jsonObjToSend={};
+ jsonObjToSend['org_id']=$('#menuHandler').val();	
+ $.ajax({
+	    url: './OrganizationService/show_selectOrganization',
+	    type: 'POST',
+	    dataType: 'json',
+	    contentType : "application/json ; charset=utf-8",
+	    data: JSON.stringify(jsonObjToSend),
+	    success: function (data, textStatus, xhr) {
+	     
+	        console.log(data);
+	      bindTableData2(data);	
+	      
+	     
+	    },
+	    error: function (xhr, textStatus, errorThrown) {
+	        console.log('Error in Operation');
+	    }
+	   
+	    
+	});	
+}
+
+function btn()
+{	
+	var btn="<div class='row btn-grp' align='center'  >"+
+	  "<a type='button' value='Assign' class='btn btn-primary' id='content'  onclick='send_radiValue();'>"+"Assign"+"</a>"+
+	  "</div>";	  
+	document.getElementById("btnid").innerHTML = btn;	
+}
+
+</script>
+<script>																																																																																																																																																																																				
+function handleClick(org_report_id,report_name,report_id,org_id) { 
+	
+	 //alert("report"+report_id);	 
+	// alert("org"+org_id);	 
+     // alert("org_report"+org_report_id); 
+	// alert("report_name"+report_name);
+	
+	// console.log(data);
+	
+	 var jsonObjToSend={};
+	//alert(jsonObjToSend);
+	
+	jsonObjToSend.org_report_id=org_report_id;
+	jsonObjToSend.report_name=report_name;
+	jsonObjToSend.report_id=report_id;
+	jsonObjToSend.org_id=org_id;
+	
+	
+	
+	var org=JSON.stringify(jsonObjToSend);
+	alert("bbb" +JSON.stringify(jsonObjToSend));
+
+	
+	  localStorage.setItem("orgnameid", org);
+	  //alert(localStorage.getItem("orgnameid"));
+	// localStorage.setItem("orgiD", idd);
+	// localStorage.setItem("org_report_iD", org_report_id); 
+	window.open('CustomizedReport1.html', '_self');
+}
+</script>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</html>

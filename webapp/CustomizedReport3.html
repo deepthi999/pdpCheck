@@ -1,0 +1,558 @@
+<!DOCTYPE>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	
+	
+
+<link rel="stylesheet" href="Style.css">
+<script type="text/javascript" src=".\js\highchecktree.js"></script>
+<script type="text/javascript" src=".\js\filters.js"></script>
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css"
+	rel="stylesheet" type="text/css">
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans'
+	rel='stylesheet' type='text/css'>
+
+</head>
+<style>
+.clickable{
+text-decoratioon:none;
+}
+.clickable:hover{
+text-decoration:underline;
+}
+#thd{
+background-color:#0088cc;
+color:white;
+}
+</style>
+
+
+
+
+
+<script  type="text/javascript">
+
+function verifying() {
+		var ReportNames = localStorage.getItem('orgnameid');
+		var event = JSON.parse(ReportNames);
+		var Reportname = event.report_name;
+		var org_report_id = event.org_report_id;
+		
+		//alert(Reportname);
+		
+		document.getElementById("spantext").innerHTML = Reportname;
+		
+		
+		
+		var OrganizationName = localStorage.getItem('OrganizationName');
+		
+		document.getElementById("OrganizationName").innerHTML = OrganizationName;
+		
+		
+		//To Fetche Already inserted Conditions
+		
+		//this.getWhereCondition(report_id);
+		//this.bindFilterParams();
+		
+		var data= "{org_report_id:"+ org_report_id + "}";
+	//alert(data);
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GenerateOrgReport' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+			
+				//alert("qqqq"  +JSON.stringify(data));
+				data = data.returnData;
+			
+				var Reportname = data[0].v_sql;
+				document.getElementById("txtArea").innerHTML = Reportname;
+				
+				data = document.getElementById("txtArea").innerHTML;
+				data = data.replace(/\s+/g, " ");
+				  data = data.replace(/"/g, "'");			//to Replace with single quotes in plcae of "
+				data = "{" + "\"query\"" + ":\"" + data + "\"}";
+				//alert("mfh"+data);
+	        localStorage.setItem('Custgeneratedquery',data);
+				
+				
+				
+				
+			}
+		});
+		
+		
+		
+		
+		
+var data= "{org_report_id:"+ org_report_id + "}";
+		//alert("bbbb"+data);
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GetOrgReportJoins' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+				//data = data.returnData;
+				
+			
+				//alert("tbs"  +JSON.stringify(data));
+				
+				bindTableDatajoins(data)
+				
+				
+			}
+		});
+		
+		function bindTableDatajoins(data){
+			  var arr = data.returnData;
+			 //alert(arr);
+			tmpstr =  "<table class=\"table table-bordered\">";
+			
+
+			 tmpstr = tmpstr +  "<th>" + "Table 1 Name "  + "</th>" +  "<th>"+ "	Join condition "  + "</th>" +  "<th>"+ "Table 2 Name "  + "</th>" +  "<th>" + "Query "  + "</th>"  +"<th>"+"Delete"+"</th>" ;
+			 if(arr!=null){
+			for(var i=0;i<arr.length;i++)
+			{  
+				 str = "<td data-toggle='collapse' data-target=''#OrgReportFields' class='clickable' ><img height='30px' src='./images/del.png' onClick='getorgalias("
+						+ arr[i].org_report_id	
+						+ ", "
+						+ arr[i].org_join_id
+						
+						+ ");'></img></td>";
+						
+			jointype=	"<td>"+ arr[i].join_type +	"</td>"	;
+			secondtableName="<td>"+ arr[i].table_2_id +	"</td>"	;
+			Query="<td>"+ arr[i].join_condition +	"</td>"	;
+			//LogicalOperator="<td>"+ "AND" +	"</td>"	;
+			
+						
+						
+			tmpstr +=  '<tr><td >' + arr[i].table_1_id +'   </td>'+ jointype +''+ secondtableName + ''+ Query + ''+ str + '</tr>';	
+			//tmpstr+="</tr>";
+			//alert(tmpstr);
+			}	
+
+			 }
+			 else{
+			     //alert("report names are not found");
+			    }	
+			document.getElementById("tables").innerHTML = tmpstr;
+			} 
+		
+		
+		
+		
+	//this is for filters	
+		var data = {};
+		data.org_report_id = org_report_id;
+		data.org_criteria_id = "NULL";
+		
+		
+		
+		
+		var data = JSON.stringify(data);
+		
+		//alert("aaaa"+data);
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GetOrgReportCriteria' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+				//alert(data);
+				//data = data.returnData;
+				
+			
+				//alert("PARAM"  +JSON.stringify(data));
+				
+				bindTableDataparams(data)
+				
+				
+			}
+		});
+		
+		
+		
+		function bindTableDataparams(data){
+			  var arr = data.returnData;
+			 //alert(arr);
+			tmpstr =  "<table class=\"table table-bordered\">";
+
+			
+
+			 tmpstr = tmpstr +  "<th>" + "Filter Label "  + "</th>" +  "<th>"+ "	Filter Type "  + "</th>"  + "</th>" +"<th>"+"Delete"+"</th>" ;
+			 if(arr!=null){
+			for(var i=0;i<arr.length;i++)
+			{  
+				 str = "<td data-toggle='collapse' data-target=''#OrgReportFields' class='clickable' ><img height='30px' src='./images/del.png' onClick='getorgaliass("
+					 + arr[i].org_report_id	
+						+ ", "
+						+ arr[i].org_criteria_id
+						
+						+ ");'></img></td>";
+						
+			FilterType=	"<td>"+ arr[i].param_type +	"</td>"	;
+			
+			
+						
+						
+			//tmpstr +=  '<tr><td >' + arr[i].criteria_label +'   </td>'+arr[i].criteria_type +''+ str + '</tr>';	
+			tmpstr +=  '<tr><td >' + arr[i].criteria_label +'</td>'+ '<td>'+arr[i].criteria_type +'</td>'+ str + '</tr>';	
+
+			//tmpstr+="</tr>";
+			//alert(tmpstr);
+			}	
+
+			 }
+			 else{
+			    // alert("report names are not found");
+			    }	
+			document.getElementById("tableforfilters").innerHTML = tmpstr;
+			} 
+		
+		
+	//This is for where condition
+	
+	
+	
+	
+		var data= "{org_report_id:"+ org_report_id + "}";
+		//alert("bbbb"+JSON.stringify(data));
+		
+		$
+		.ajax({
+			url :'./OrganizationService/GetOrgReportCriteriaByReportId' ,
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+				data = data.returnData;
+				//var org_criteria=JSON.stringify(data);
+			
+				//alert("wherecon::::::" +org_criteria );
+				
+				document.getElementById("wherecondition").innerHTML = data[0].criteria;
+				
+			}
+		});
+	
+		
+		
+		
+		
+		
+		
+	}
+
+</script>
+<script>
+
+function getorgalias(org_report_id,org_join_id){
+	
+	alert("hii");
+	
+	
+  alert(org_report_id);
+	lert(org_join_id);
+	
+	 data = {};
+	data.org_report_id = org_report_id;	
+	data.org_join_id = org_join_id;
+	
+	alert(JSON.stringify(data));
+	data1 = JSON.stringify(data);
+	//alert(data1); 
+	
+	 $.ajax({
+		url : './OrganizationService/RemoveOrgReportjoins',
+		type : 'POST',
+		data : data1,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+			//alert("HIII");
+			console.log(data);
+			//alert(JSON.stringify(data));
+			verifying(data);
+			
+	     var x = document.getElementById('tables');
+			x.style.display = 'block'; 
+		}
+	});  
+	
+}
+</script>
+<script>
+
+function getorgaliass(org_report_id,org_criteria_id){
+	
+	alert("hii");
+	
+	
+    alert(org_report_id);
+	alert(org_criteria_id);
+	
+	 data = {};
+	data.org_report_id = org_report_id;	
+	data.org_criteria_id = org_criteria_id;
+	
+	alert(JSON.stringify(data));
+	data1 = JSON.stringify(data); 
+	//alert(data1); 
+	
+	 $.ajax({
+		url : './OrganizationService/RemoveOrgReportCriteria',
+		type : 'POST',
+		data : data1,
+		dataType : 'JSON',
+		contentType : "application/json",
+		success : function(data) {
+			alert("HIII");
+			console.log(data);
+			//alert(JSON.stringify(data));
+			verifying(data);
+			
+	     var x = document.getElementById('tableforfilters');
+			x.style.display = 'block'; 
+		}
+	}); 
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body onload="verifying();">
+<div id="header"></div>
+<div class="container">
+
+<div class="panel panel-default panel-box">
+    <!-- <div class="panel-heading" style="text-align: center">
+    <table align="center">
+   <tr>
+   <td><b style="font-size:20px;">Organization Name:</b></td>
+   <td id="OrganizationName"><b style="font-size:20px;"><span style=" font-size: 20px;" id="OrganizationName"></span></b></td>
+   </tr>
+   <tr>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Report Name:</b></td>
+   <td><b style="font-size:20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;General Reports</b></td>
+   </tr>
+   </table>
+    </div> -->
+    
+    
+   <div class="panel-heading" style="text-align: center"> 
+    <b style=" font-size: 20px;">Organization Name: </b> &nbsp <b><span style=" font-size: 20px;" id="OrganizationName"></span></b><br>
+  
+    
+    <b style=" font-size: 20px;margin-left: 7%;">Report Name: </b>&nbsp <b><span style=" font-size: 20px;" id="spantext"></span></b>
+     </div>
+    
+    
+    
+    
+    <div class="panel-body">
+      <h2 class="text-center"><b style="float:left;color: #5c5958 !important;">Query Preview</b></h2>
+      <textarea id="txtArea" class="form-control" disabled rows="10" cols="80" name="ReportDescription">
+	  </textarea>
+      <!--<div class="row btn-grp" style="margin-top: 15px;text-align: center">
+        <a type="button" class="btn btn-primary" id="btnsave">Validate</a>
+        <a type="button" class="btn btn-primary" href="3.html">Prev</a>
+        <a type="button" class="btn btn-primary" id="btnRun" href="#">Next</a>
+       
+      </div>-->
+    </div>
+  </div>
+<body>
+
+
+<h4>Existing Joins </h4>
+<div class="row">
+ <div class="col-md-10 col-sm-10" style="    width: 100%;" >
+
+  <div class="table" id="tables"></div>
+  </div>
+  
+  <div class="col-md-2 col-sm-2" >
+<input type="button" class="btn btn-primary" value="+"
+									onclick=" GenerateQuery(); CheckAlias();" data-toggle="tooltip" title="add query" style="width: 100px;
+    /* float: right; */
+    margin-left: 1153px;
+    margin-right: -1095p;
+    margin-top: -101px;
+}"> </input>
+</div>
+</div>
+
+
+
+	<h4>Existing Filters </h4>
+	<div class="row">
+ <div class="col-md-10 col-sm-10"  style="width:100%;">
+	<div class="table" id="tableforfilters"></div>
+ </div>
+  
+  <div class="col-md-2 col-sm-2"  >
+<input type="button" class="btn btn-primary" value="+"
+									onclick=" GenerateQuery(); CheckAlias();" data-toggle="tooltip" title="add filter" style="width: 100px;
+    /* float: right; */
+    margin-left: 1153px;
+    margin-right: -1095p;
+    margin-top: -101px;
+}"> </input>
+</div>
+</div>
+
+
+<div class="row">
+ <!--  <div class="table table-bordered" id="tablesFilters"></div> -->
+  
+  <!-- <div class="col-md-0">
+<input type="button" class="btn btn-primary" value="+"
+									onclick=" GenerateQuery(); CheckAlias();" data-toggle="tooltip" title="add query" style="width:100px;float:right;margin-left:15px;margin-right:65px;margin-top:25px"> </input>
+</div> -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <h4>Existing Joins </h4>
+<div class="row">
+<div class="col-md-10 col-sm-10">
+<table class="table table-bordered">
+    <thead>
+	<tr>
+	<th id="thd">Table 1 Name</th>
+	<th id="thd">Join condition</th>
+	<th id="thd">Table 2 Name</th>
+	<th id="thd">Query</th>
+	<th id="thd">Logical Operator</th>
+	<th id="thd">Delete</th>
+	</tr>
+      <tr>
+        <tbody>
+		<tr>
+        <td>aph</td>
+        <td>LEFT OUTER JOIN</td>
+        <td>apl</td>
+        <td>ON aph.APPORD=aph.APHID</td>
+        <td>AND</td>
+        <td><img height="30px" src="./images/del.png"></td>
+      </tr>
+	  </tbody>
+    </thead>
+   
+  </table>
+</div>
+<div class="col-md-2 col-sm-2">
+<input type="button" class="btn btn-primary" value="+"
+									onclick=" GenerateQuery(); CheckAlias();" data-toggle="tooltip" title="add query" style="width:100px;float:right;margin-left:15px;margin-right:65px;margin-top:25px"> </input>
+</div>
+</div> -->
+
+				
+				
+<!-- 		<h4>Existing Filters </h4>
+		<div class="row">
+        <div class="col-md-10 col-sm-10">
+		<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th id="thd">Filter Label</th>
+        <th id="thd">Filter Type</th>
+        <th id="thd">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Vendor Name</td>
+        <td>Text</td>
+        <td><img height="30px" src="./images/del.png" ></td>
+      </tr>
+      <tr>
+        <td>Product ID</td>
+        <td>Text</td>
+        <td><img height="30px" src="./images/del.png" ></td>
+      </tr>
+      
+    </tbody>
+  </table>
+  </div>
+  <div class="col-md-2 col-sm-2">
+   <button class="btn btn-primary" id="opt_selbtn" onclick="addFilter()" style="width:100px;margin-top:25px;">+</button>	
+  </div>
+  </div> -->
+  <h4>Existing Criteria </h4>
+  <div class="row" >		
+    	<div class="col-md-10 col-sm-10">
+      <textarea id="wherecondition" rows="6" cols="131" name="ReportDescription"		
+				placeholder="WHERE t2.Column2 IN (10, 20, 30)		
+         		AND t3.Column9 = OPEN"	 style="    width: 121%;"></textarea>
+			</div>
+			</div>
+	
+ <!-- button class="btn btn-primary" style="width:100px;margin-right:20px;float:right;background-color:#0088c">Customize</button>  -->
+ <a href="custimized_report1.html" class="btn btn-primary" style="width:100px;margin-right: -12%;float:right;width: 10%;background-color:#0088c;margin-top: -4%;">Run Report</a>
+ <br>
+ <br>
+</div>
+<div id="footer" style="margin-top: 4%;"></div>
+</body>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+
+

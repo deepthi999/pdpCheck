@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Report Launch Screen</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <link rel="stylesheet" href="Style.css">
+<script>
+function verifying()
+{
+var ReportName =localStorage.getItem('ReportName');
+document.getElementById("text").innerHTML=ReportName;
+}
+</script>
+</head>
+<body  onload="verifying();">
+
+<div id="header"></div>
+<div class="container">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading"><b>Report Name :</b> <span id="spantext"></span></div>
+    <div class="panel-body">
+            <h3 class="text-center">Filter Data</h3>
+      <div class="col-md-6 col-md-offset-3">
+            <label for="dummy1">Filter 1 Label:</label>
+            <input id="d1" class="form-control" type="text" name="Filter 1 Label" ><br><br>
+            <label for="dummy2">Filter 2 Label:</label>
+            <input id="d2" class="form-control" type="text" name="Filter 2 Label" ><br><br>
+            <label for="dummy3">No.of records per page:</label>
+            <input id="d3" class="form-control" type="number" name="No. of records per page" size="1" maxlength="2" ><br><br><br>
+            <div class="row btn-grp" style="margin-top: 15px;text-align: center">
+              <a type="button" class="btn btn-primary" href="#">Run Report</a>
+            </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</body>
+</html>

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>:: Sun Set Reports : Select Fields, Set Join Conditions
+	and Filters ::</title>
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="Style.css">
+<script type="text/javascript" src=".\js\highchecktree.js"></script>
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css"
+	rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href=".\highCheckTree.css" />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans'
+	rel='stylesheet' type='text/css'>
+
+<style type="text/css">
+.box1 {
+	margin-left: 400px;
+	margin-top: -160px;
+}
+
+.col {
+	margin-left: 500px;
+}
+
+p.ridge {
+	border-style: ridge;
+}
+
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+a {
+	color: black;
+	text-decoration: none;
+}
+
+#copyText, #joinTextA, #Addjoincondition, #MultijoinTextA,
+	#Addmultijoincondition {
+	/*  width:1000px;
+		         font-size:10.5pt; */
+	/* height: 25px;
+		    width: 963px; */
+	
+}
+
+body {
+	font-family: 'Open Sans';
+	font-size: 14px;
+}
+
+#main-container {
+	width: 600px;
+	margin: 150px auto;
+}
+
+#tree-container label.hover {
+	color: red;
+}
+</style>
+</head>
+<body onload="LoadDoc(); verifying();">
+	<div id="header"></div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<br> <br>
+
+				<div align="left">
+					<b><h2>Report Name:</h2></b> <span id="spantext"></span>
+				</div>
+
+				<span name="ColumnsBindingData" id="ColumnsBindingData"></span>
+
+				<div class="row">
+					<div class="col-md-12">
+						<h4>Define Joins (One row will be displayed for each join)</h4>
+						<textarea cols="160" name="text" id="copyText"
+							onkeyUp="copyText()"></textarea>
+						</td>
+					</div>
+				</div>
+
+				<br>
+				<h4>Define Custom Fields (if any)</h4>
+				<table style="width: 100%" class=" table table-bordered">
+					<tr>
+						<th>Custom Field Definition</th>
+						<th>Alias Name</th>
+					</tr>
+
+					<tr>
+						<td width="50%"><input type="text" id="Customfield1"
+							class="form-control" name="Hello2" size="80"
+							placeholder="fnGetTypeDescription(t1.type_id)" /></td>
+						<td><input type="text" id="AliasName1" class="form-control"
+							name="Hello3" size="80" placeholder="TypeDesc" /></td>
+					</tr>
+					<tr>
+						<td width="50%"><input type="text" id="Customfield2"
+							class="form-control" name="Hello4" size="80"
+							placeholder="Substring(t2.name, 10)" /></td>
+
+						<td><input type="text" id="AliasName2" class="form-control"
+							name="Hello5" size="80" placeholder="ItemCode" /></td>
+
+					</tr>
+				</table>
+				<br>
+
+				<hr>
+
+				<div class="row">
+
+					<div class="col-md-3">
+						<div class="form-group">
+							<label for="usr">Select Table:</label> 
+							<select class="form-control" id="DLState3"> Select First Table
+							</select>
+						</div>
+					</div>
+
+					<div class="col-md-3">
+						<div class="form-group">
+							<label for="usr">Type of Join: </label> <select
+								class="form-control" id="joins">
+								<option>select</option>
+								<option>INNER JOIN</option>
+								<option>OUTER JOIN</option>
+								<option>LEFT OUTER JOIN</option>
+								<option>RIGHT OUTER JOIN</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="col-md-3">
+						<div class="form-group">
+							<label for="usr">Select Second Table:</label> <select
+								class="form-control" id="DLState4"> Select Second Table
+							</select>
+						</div>
+					</div>
+
+					<div class="col-md-3">
+						<div class="form-group">
+							<label for="usr">Select Join: (optional) </label> <select
+								class="form-control" id="DLState4_1">
+								<option>select</option>
+								<option>AND</option>
+								<option>OR</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<br> <br> <br>
+				<!-- 
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="usr">Select Column for Tabel I:</label> <select
+								class="form-control" id="mouritable1">
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="usr">Select Column for Tabel II:</label> <select
+								class="form-control" id="mouritable2">
+							</select>
+						</div>
+					</div>
+					-->
+				<div class="col-md-4" style="margin-top: 25px;">
+					<div class="form-group">
+						<label for="usr">Add Condition:</label> <input
+							id='Addjoincondition' size="40"></input>
+					</div>
+				</div>
+				<div class="col-md-4" style="margin-top: 25px;">
+					<input type="button" class="btn btn-primary" value="Add Query"
+						onclick=" GenerateQuery()"> </input>
+
+				</div>
+			</div>
+			<br>
+
+			<div class="row">
+				<div class="col-md-12" id="existingJoins"></div>
+			</div>
+
+
+			<br>
+
+			<h4>JOIN Query</h4>
+
+			<div class="row">
+				<div class="col-md-12">
+					<textarea type="text" class="form-control" rows="2" name="text"
+						id="joinTextA" onkeyUp="joinText()"></textarea>
+				</div>
+			</div>
+
+			<hr>
+
+			<h4>Define multiple joins (if any)</h4>
+
+			<div class="row">
+
+				<div class="col-md-3">
+					<div class="form-group">
+
+						<div class="form-group">
+							<label for="usr">Select Join:</label> <select
+								class="form-control" id="multijoins">
+								<option>select</option>
+								<option>INNER JOIN</option>
+								<option>OUTER JOIN</option>
+								<option>LEFT OUTER JOIN</option>
+								<option>RIGHT OUTER JOIN</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="usr">Select Table:</label> <select
+							class="form-control" id="DLState5">
+						</select>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="usr">Add Join Condition:</label> 
+						<input id='Addmultijoincondition'></input>
+					</div>
+
+				</div>
+
+				<div class="col-md-3" style="margin-top: 25px;">
+					<input class="btn btn-default" type="submit" value="Multiple joins"
+						onclick="GenerateMultipleJoins()" id="Multiplejoins"></input>
+				</div>
+
+			</div>
+
+			<h4>Multi JOIN Query</h4>
+
+			<textarea class="form-group" rows="2" name="text"
+				id="MultijoinTextA" onkeyup="joinText()" style="width: 850px;"></textarea>
+			
+
+      <h4>Define Conditions (if any)</h4>
+      <textarea id="wherecondition" rows="6" cols="40" name="ReportDescription" placeholder="WHERE t2.Column2 IN (10, 20, 30)
+         AND t3.Column9 = OPEN" style="width: 850px;">      </textarea>
+
+
+      <h4>Define Filters</h4>
+      <table style="width:100%" class="table table-bordered">
+         <tr>
+            <th>Field Name</th>
+            <th>Type</th>
+            <th>Operator</th>
+            <th>Query</th>
+         </tr>
+         <tr >
+            <td><input type="text" name="Hello5" size="20" /></td>
+            <td><input type="text" name="Hello6" size="20" /></td>
+            <td><input type="text" name="Hello7" size="20" /></td>
+            <td><input type="text" name="Hello8" size="20" /></td>
+         </tr>
+      </table>
+      <br><br>
+
+
+<!-- 
+
+		<h4>Define Conditions (if any)</h4>
+		<textarea id="txtArea" rows="6" cols="40" name="ReportDescription"
+			placeholder="WHERE t2.Column2 IN (10, 20, 30)
+AND t3.Column9 = OPEN">
+</textarea>
+
+		<h4>Define Filters</h4>
+		<table style="width: 100%">
+			<tr>
+				<th>Field Name</th>
+				<th>Type</th>
+				<th>Operator</th>
+				<th>Query</th>
+			</tr>
+			<tr>
+				<td><input type="text" name="Hello5" size="40" /></td>
+				<td><input type="text" name="Hello6" size="40" /></td>
+				<td><input type="text" name="Hello7" size="40" /></td>
+				<td><input type="text" name="Hello8" size="40" /></td>
+			</tr>
+		</table>
+
+		<br> <br>
+		-->
+
+			<div align="right">
+				<input class="btn btn-primary form-group" value="Save" id="btnSave"
+					style="width: 200px; margin-right: 20px;" type="submit">
+				<button class="btn btn-primary"
+					style="width: 200px; margin-right: 20px;">
+					<a href="index.html" style="color: white;">Prev</a>
+				</button>
+				<button id="btn" class="btn btn-primary" style="width: 200px;">
+					<a href="4.html" style="color: white;">Next</a>
+				</button>
+
+			</div>
+
+			<br> <br> <br>
+
+		</div>
+	</div>
+	</div>
+	<div id="footer"></div>
+</body>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="./js/utils/constants.js"></script>
+<script>
+	function LoadDoc() {
+		//document.getElementsByTagName("header")[0].innerHTML = HEADER_SECTION;
+		//document.getElementsByTagName("footer")[0].innerHTML = FOOTER_SECTION;
+		//document.getElementById("reportName").innerHTML = REPORT_NAME;
+	}
+
+	function verifying() {
+		var ReportNames = localStorage.getItem('reportsData');
+		var event = JSON.parse(ReportNames);
+		var Reportname = event[0].report_name;
+		document.getElementById("spantext").innerHTML = Reportname;
+	}
+
+	function copyText() {
+		var join = document.getElementById("text");
+		var Text = document.getElementById("txtArea");
+		/* Text.value=Text.value+join.value; */
+	}
+</script>
+<script>
+	var selectedarr = [];
+	var inputarr = [];
+	var existingCols = [];
+	var prevSelectedArr = []
+	var prevInputArr = []
+	var reportID = null;
+	var results = [];
+
+	if (localStorage.getItem("inputarr") != undefined)
+		prevInputArr = JSON.parse(localStorage.getItem("inputarr"));
+	if (localStorage.getItem('reportsData') != undefined)
+		reportID = JSON.parse(localStorage.getItem('reportsData'))[0].report_id;
+	if (localStorage.getItem("copyText") != undefined) {
+		document.getElementById("copyText").value = localStorage
+				.getItem("copyText");
+		document.getElementById("copyText").readOnly = true;
+	}
+	if (localStorage.getItem("joinTextA") != undefined) {
+		document.getElementById("joinTextA").value = localStorage
+				.getItem("joinTextA");
+		document.getElementById("joinTextA").readOnly = true;
+	}
+
+	if (localStorage.getItem("MultijoinTextA") != undefined) {
+		document.getElementById("MultijoinTextA").value = localStorage
+				.getItem("MultijoinTextA");
+		document.getElementById("MultijoinTextA").readOnly = true;
+	}
+
+	$(document).ready(function() {
+		alert("BEFORE SAVE");
+		getExistingCols();
+		localStorage.removeItem("selectedarr");
+		alert("EX COLS" + localStorage.getItem("existingCols"));
+		bindDropBox_columns(JSON.parse(localStorage.getItem('lists')));
+	});
+
+	function bindDropBox_columns(oData) {
+		var jsonObjToSend = {};
+		jsonObjToSend.tableList = oData;
+		$.ajax({
+			url : SERVER_CLIENT_SERVICE_URL + '/getColumns',
+			type : 'POST',
+			dataType : 'json',
+			contentType : "application/json ; charset=utf-8",
+			data : JSON.stringify(jsonObjToSend),
+			success : function(data, textStatus, xhr) {
+				console.log("Client Columns::" + data);
+				bindTableData(data);
+			},
+			error : function(xhr, textStatus, errorThrown) {
+				console.log('Error in Operation Client getColumns');
+			}
+		});
+	}
+
+	function bindTableData(data) {
+		var arr = data.returnData;
+		var colList = JSON.stringify(arr);
+		localStorage.setItem('tabledata', colList);
+		var tableids = JSON.parse(localStorage.getItem('list'));
+
+		var results = [];
+
+		$(arr).each(function() {
+			datum1 = this;
+			$(tableids).each(function() {
+				datum2 = this;
+				if (datum1.table_name == datum2.table_name)
+					results.push($.extend({}, datum1, datum2));
+			});
+		});
+
+		if (localStorage.getItem("existingCols") != undefined) {
+			existingCols = JSON.parse(localStorage.getItem("existingCols"));
+		}
+		var tableIds = JSON.stringify(results);
+
+		localStorage.setItem("tableDetails", tableIds);
+
+		var dbname = localStorage.getItem('databaseName');
+
+		tmpstr = "<table class='table table-bordered'>";
+		tmpstr = tmpstr + "<th></th>" + "<th>" + "Coloumns From " + dbname
+				+ "</th>" + "<th>" + "Report Field Display name </th>";
+
+		for (var i = 0; i < results.length; i++) {
+			str = '<tr><td><input type="checkbox" id="chk' + i + '" value="'
+					+ results[i].COLUMN_NAMES
+					+ '" onClick=" ShowHideDiv(this, ' + i
+					+ '); handleClick(this);"/></td>';
+			str1 = '<td><input type="text" id="seltabId_'+i+'" name="val[]" value="" style="display: none"/></td>';
+			for (var j = 0; j < existingCols.length; j++) {
+				if (existingCols[j].field_name == results[i].COLUMN_NAMES) {
+					alert("DDDDDDD" + existingCols[j].field_name);
+					prevSelectedArr.push(i);
+					//inputarr.push(existingCols[j].field_label);
+					str = '<tr><td><input type="checkbox" id="chk' + i
+							+ '" value="' + results[i].COLUMN_NAMES
+							+ '" checked onClick=" ShowHideDiv(this, ' + i
+							+ '); handleClick(this);"/></td>';
+					str1 = '<td><input type="text" id="seltabId_' + i + '" name="val[]" value="'+ existingCols[j].field_label + '"/></td>';
+					break;
+				}
+			}
+			tmpstr += str + '<td>' + results[i].COLUMN_NAMES + '</td>' + str1
+					+ '</tr>';
+		}
+		tmpstr += "</table>";
+		document.getElementById("ColumnsBindingData").innerHTML = tmpstr;
+	}
+
+	function getExistingCols() {
+		alert("IN EX COLS");
+		var jsonObjToSend1 = {};
+		t = {};
+		t.reportid = reportID;
+		jsonObjToSend1.reportid = t;
+
+		$.ajax({
+			url : SERVER_URL + '/getColumns',
+			type : 'POST',
+			dataType : 'json',
+			contentType : "application/json ; charset=utf-8",
+			data : JSON.stringify(jsonObjToSend1),
+			success : function(data, textStatus, xhr) {
+				console.log(data);
+				bindExistingCols(data, reportID);
+			},
+			error : function(xhr, textStatus, errorThrown) {
+				console.log('Error in Operation');
+			}
+		});
+	}
+
+	function bindExistingCols(data, reportId) {
+		if (data.show_ColoumnNamesbasedonid == "success") {
+			localStorage.setItem("existingCols", JSON
+					.stringify(data.returnData));
+		}
+		getExistingJoins(reportId);
+	}
+
+	function getExistingJoins(reportId) {
+
+		t = {};
+		t.reportid = reportId;
+
+		$.ajax({
+			url : SERVER_URL + '/getjoins',
+			type : 'POST',
+			dataType : 'json',
+			contentType : "application/json ; charset=utf-8",
+			data : JSON.stringify(t),
+			success : function(data, textStatus, xhr) {
+				console.log("Get JOINS::::" + JSON.stringify(data));
+				alert(JSON.stringify(data));
+				bindExistingJoins(data, reportId);
+			},
+			error : function(xhr, textStatus, errorThrown) {
+				console.log('Error in Operation');
+			}
+		});
+	}
+
+	function bindExistingJoins(data) {
+		if (data.getjoins_by_id == "success") {
+			data = data.returnData;
+			var str = "<table class='table table-bordered'>";
+			for (i = 0; i < data.length; i++) {
+				str += "<tr>";
+				str += "<td>FROM</td>";
+				str += "<td>" + data[i].table_1_id + "</td>";
+				str += "<td>" + data[i].join_type + "</td>";
+				str += "<td>" + data[i].table_2_id + "</td>";
+				str += "<td>" + data[i].join_condition + "</td>";
+				str += "<td><img height='30px' src='./images/del.png' onClick='delJoins("
+						+ data[i].join_id
+						+ ", "
+						+ data[i].report_id
+						+ ");'></img></td>";
+				str += "</tr>";
+			}
+			str += "</table>";
+			document.getElementById("existingJoins").innerHTML = str;
+		} else {
+			document.getElementById("existingJoins").innerHTML = "";
+			document.getElementById("joinTextA").value = "";
+			
+		}		
+	}
+
+	function delJoins(joinId, reportId) {
+		data = {};
+		data.report_id = reportId;
+		data.join_id = joinId;
+
+		alert("TO be deleted Joins:" + JSON.stringify(data));
+		data = JSON.stringify(data);
+		$.ajax({
+			url : SERVER_URL + '/deletejoins',
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+			}
+		});
+		getExistingJoins(reportId);
+	}
+
+	function ShowHideDiv(sunset, id) {
+		var flag = false;
+
+		var values = new Array();
+		if (localStorage.getItem("tableDetails") != undefined)
+			var tableIds = JSON.parse(localStorage.getItem("tableDetails"));
+
+		if (localStorage.getItem("existingCols") != undefined)
+			existingCols = JSON.parse(localStorage.getItem("existingCols"));
+
+		if (existingCols != undefined) {
+
+			for (j = 0; j < existingCols.length; j++) {
+				if (existingCols[j].field_name == tableIds[id].COLUMN_NAMES) {
+					alert(existingCols[j].field_id);
+					dataToSend = {};
+					dataToSend.report_id = reportID;
+					dataToSend.table_id = tableIds[id].table_id;
+					dataToSend.field_id = existingCols[j].field_id;
+					deleteDBCols(dataToSend);
+					prevSelectedArr.splice(j, 1);
+					existingCols.splice(j, 1);
+					localStorage.setItem("existingCols", JSON
+							.stringify(existingCols));
+					flag = true;
+					break;
+				}
+			}
+		}
+
+		for (i = 0; i < selectedarr.length; i++) {
+			if (selectedarr[i] == id) {
+				selectedarr.splice(i, 1);
+				localStorage
+						.setItem("selectedarr", JSON.stringify(selectedarr));
+				//inputarr.splice(i, 1);
+				flag = true;
+				break;
+			}
+		}
+		if (flag == false) {
+			selectedarr.push(id);
+			localStorage.setItem("selectedarr", JSON.stringify(selectedarr));
+		}
+
+		var textAlias = document.getElementById("seltabId_" + id);
+		textAlias.style.display = sunset.checked ? "block" : "none";
+	}
+
+	function deleteDBCols(data) {
+		alert("TO be deleted:" + JSON.stringify(data));
+		data = JSON.stringify(data);
+		$.ajax({
+			url : SERVER_URL + '/deleteColumns',
+			type : 'POST',
+			data : data,
+			dataType : 'JSON',
+			contentType : "application/json",
+			success : function(data) {
+				console.log(data);
+			}
+		});
+	}
+
+	function handleClick(cb) {
+
+		var values = new Array();
+		var tableIds = JSON.parse(localStorage.getItem("tableDetails"));
+		var strArr = new Array();
+		alert("PREV" + prevSelectedArr);
+		if (prevSelectedArr != null) {
+			for (var i = 0; i < prevSelectedArr.length; i++) {
+				strArr = tableIds[prevSelectedArr[i]].COLUMN_NAMES.split('.');
+				strArr[0] = tableIds[prevSelectedArr[i]].table_alias;
+				str = strArr[0] + '.' + strArr[1];
+				values.push(str);
+			}
+		}
+
+		for (var i = 0; i < selectedarr.length; i++) {
+			strArr = tableIds[selectedarr[i]].COLUMN_NAMES.split('.');
+			strArr[0] = tableIds[selectedarr[i]].table_alias;
+			str = strArr[0] + '.' + strArr[1];
+			values.push(str);
+		}
+
+		document.getElementById("copyText").value = 'SELECT ' + " " + values;
+		localStorage.setItem("copyText",
+				document.getElementById("copyText").value);
+
+	}
+	
+	/* Single Join: On Select Table I, load the columns */
+
+    $( "#DLState3").change(function() 
+    {
+    	var $selected_table = $('option:selected',this).text();
+    	//alert( $selected_table );
+    	console.log ( 'selected_table: ' . $selected_table);
+    	var $mouritable1 = $('#mouritable1');
+    	$mouritable1.empty();
+    	for (var i = 0; i < results.length; i++)
+    	{
+	  		//console.log('results.COLUMN_NAMES: ' +  results[i].COLUMN_NAMES);
+	  		var str = results[i].COLUMN_NAMES;
+	  		if ( str.includes($selected_table) )
+	  		{
+	  			$mouritable1.append('<option value=' + results[i].COLUMN_NAMES + '>' + results[i].COLUMN_NAMES + '</option>');
+	  		}
+	  	}
+	}); 
+
+	/* Single Join: On Select Table II, load the columns */
+
+    $( "#DLState4").change(function() 
+    {
+    	var $selected_table = $('option:selected',this).text();
+    	//alert( $selected_table );
+    	console.log ( 'selected_table: ' . $selected_table);
+    	var $mouritable = $('#mouritable2');
+    	$mouritable.empty();
+    	for (var i = 0; i < results.length; i++)
+    	{
+	  		//console.log('results.COLUMN_NAMES: ' +  results[i].COLUMN_NAMES);
+	  		var str = results[i].COLUMN_NAMES;
+	  		if ( str.includes($selected_table) )
+	  		{
+	  			$mouritable.append('<option value=' + results[i].COLUMN_NAMES + '>' + results[i].COLUMN_NAMES + '</option>');
+	  		}
+	  	}
+	});
+
+	//this below code for selecting tables and select joins
+
+	$(document).ready(
+			function() {
+				var listvalues = localStorage.getItem('list');
+				//pase the value 
+				var finalvalue = JSON.parse(listvalues);
+				//alert(finalvalue);
+
+				var ddlCustomers = $('#DLState3');
+				ddlCustomers.empty().append(
+						'<option selected="selected">Please select</option>');
+				$.each(finalvalue, function() {
+					/*
+					ddlCustomers.append($("<option></option>").val(
+							this['table_id']).html(
+							this['table_name'] + " [ " + this['table_name']
+									+ " ] "));
+					 */
+					ddlCustomers.append($("<option></option>").val(
+							this['table_id']).html(this['table_name']));
+
+				});
+				$('#DLState3').on('change', function() {
+
+					var id = $('#DLState3').val();
+					// alert(id);
+					var name = $('#DLState3 :selected').text();
+					//  alert(name);
+
+				});
+
+				var ddlCustomers = $('#DLState4');
+				ddlCustomers.empty().append(
+						'<option selected="selected">Please select</option>');
+				$.each(finalvalue, function() {
+					ddlCustomers.append($("<option></option>").val(
+							this['table_id']).html(this['table_name']));
+
+				});
+				$('#DLState4').on('change', function() {
+
+					var id = $('#DLState4').val();
+					// alert(id);
+					var name = $('#DLState4 :selected').text();
+					//alert(name);
+
+				});
+
+				var ddlCustomers = $('#DLState5');
+				ddlCustomers.empty().append(
+						'<option selected="selected">Please select</option>');
+				$.each(finalvalue, function() {
+					ddlCustomers.append($("<option></option>").val(
+							this['table_id']).html(this['table_name']));
+
+				});
+				$('#DLState5').on('change', function() {
+
+					var id = $('#DLState5').val();
+					// alert(id);
+					var name = $('#DLState5 :selected').text();
+					//alert(name);
+
+				});
+
+			});
+
+	function GenerateQuery(oData) {
+		var firstTableName = $('#DLState3 :selected').text();
+		var joinVal = $('#joins').val();
+		var secondTableName = $('#DLState4 :selected').text();
+		var Addjoincondition = $('#Addjoincondition').val();
+		var selectStatement;
+		var andOrStmt = ($('#DLState4_1 :selected').text() == "select" ? ""
+				: $('#DLState4_1 :selected').text());
+		var query = firstTableName + " " + joinVal + " " + secondTableName
+				+ " ON " + Addjoincondition + " " + andOrStmt;
+		//alert(query);
+		document.getElementById("joinTextA").value = ' FROM' + " " + query;
+		document.getElementById("Addjoincondition").value = $(
+				'#Addjoincondition').val()
+				+ " " + andOrStmt;
+		localStorage.setItem("joinTextA",
+				document.getElementById("joinTextA").value);
+	}
+
+	function GenerateMultipleJoinss(oData) {
+
+		var multijoinVal = $('#multijoins').val();
+		var thirdTableName = $('#DLState5').val();
+		var Addmultijoincondition = $('#Addmultijoincondition').val();
+
+		var GenerateMultipleJoins;
+		var selOption = $("#DLState5").find(":selected").text();
+
+		var values = new Array();
+		$.each($("input[name='chk']:checked").closest("td").siblings("td"),
+				function(i) {
+					if (i === 0) {
+						GenerateMultipleJoins = "";
+					}
+					values.push($(this).text());
+					//selectStatement=  selectStatement  +$(this).text() +",";
+
+					//selectStatement=  selectStatement + selectTableName+"." +$(this).text();
+				});
+
+		var query = multijoinVal + " " + thirdTableName + " ON "
+				+ Addmultijoincondition;
+		alert(query);
+		document.getElementById("MultijoinTextA").value = query;
+
+	}
+
+	function GenerateMultipleJoins(oData) {
+		var selOption = $("#DLState5").find(":selected").text();
+		var multijoinVal = $('#multijoins').find(":selected").text();
+		var Addmultijoincondition = $('#Addmultijoincondition').val();
+
+		$("#MultijoinTextA").val(
+				function() {
+					return this.value + multijoinVal + ' ' + selOption + ' ON '
+							+ Addmultijoincondition + ' '
+				}).prependTo("#MultijoinTextA");
+		localStorage.setItem("MultijoinTextA", document
+				.getElementById("MultijoinTextA").value);
+		alert("MULLLLLL" + document.getElementById("MultijoinTextA").value);
+	}
+
+	$(document)
+			.ready(
+					function() {
+
+						$('#btn')
+								.on(
+										'click',
+										function() {
+
+											/* var joinTextA=document.getElementById("joinTextA").value;
+											localStorage.setItem("txtAreaa",joinTextA);
+											
+											var copyText=document.getElementById("copyText").value;
+											localStorage.setItem("copyTextA",copyText); */
+
+											var Customfield = document
+													.getElementById("Customfield1").value;
+											localStorage.setItem("Custom1",
+													Customfield);
+
+											var Customfield1 = document
+													.getElementById("Customfield2").value;
+											localStorage.setItem("Custom2",
+													Customfield1);
+
+											var AliasName = document
+													.getElementById("AliasName1").value;
+											localStorage.setItem("Alias1",
+													AliasName);
+
+											var AliasName1 = document
+													.getElementById("AliasName2").value;
+											localStorage.setItem("Alias2",
+													AliasName1);
+
+											var textToPass = document
+													.getElementById('copyText').value
+													+ ' '
+													+ document
+															.getElementById('joinTextA').value
+													+ ' '
+													+ document
+															.getElementById('MultijoinTextA').value
+													+ ' '
+													+ document
+															.getElementById('txtArea').value;
+											localStorage.setItem("myText",
+													textToPass);
+
+										});
+					});
+</script>
+
+
+<!-- below code for Multiplejoins -->
+<script type="text/javascript">
+	$(document)
+			.ready(
+					function() {
+
+						$("#Multiplejoins")
+								.click(
+										function() {
+											var ReportNames = localStorage
+													.getItem('reportsData');
+											var event = JSON.parse(ReportNames);
+											// alert(event);
+											var Reportid = event[0].report_id;
+
+											var jsonObjtoSend = {};
+
+											if (localStorage
+													.getItem('mulJoinsArr') != undefined) {
+												multijoinsarray = JSON
+														.parse(localStorage
+																.getItem('mulJoinsArr'));
+												//var multijoinsarray = [];
+
+												// alert("In here::::::");
+												// alert(multijoinsarray);
+											} else {
+												var multijoinsarray = [];
+												// alert("In Empty::::::");
+												//alert(JSON.parse(multijoinsarray));
+											}
+
+											jsonObjtoSend.report_id = Reportid;
+											jsonObjtoSend.join_type = $(
+													'#multijoins').val();
+											jsonObjtoSend.table_2_id = $(
+													'#DLState5').val();
+											jsonObjtoSend.table_1_id = $(
+													'#DLState5').val();
+											jsonObjtoSend.join_condition = " ON "
+													+ $(
+															'#Addmultijoincondition')
+															.val();
+
+											var data = (JSON
+													.stringify(jsonObjtoSend));
+											// alert(data);
+											multijoinsarray.push(jsonObjtoSend);
+											localStorage
+													.setItem(
+															"mulJoinsArr",
+															JSON
+																	.stringify(multijoinsarray));
+											// alert("LS:::"+localStorage.getItem('mulJoinsArr'));
+										});
+
+					});
+</script>
+
+
+
+
+
+
+
+
+<!-- below code for save button -->
+
+<script type="text/javascript">
+	$(document)
+			.ready(
+					function() {
+						$("#btnSave")
+								.click(
+										function() {
+											var data = localStorage
+													.getItem('tabledata');
+											var arr = JSON.parse(data);
+											var tableids = localStorage
+													.getItem('list');
+											var t = JSON.parse(tableids);
+
+											var results = [];
+											$(arr)
+													.each(
+															function() {
+																datum1 = this;
+																$(t)
+																		.each(
+																				function() {
+																					datum2 = this;
+																					if (datum1.table_name == datum2.table_name)
+																						results
+																								.push($
+																										.extend(
+																												{},
+																												datum1,
+																												datum2));
+																				});
+															});
+
+											var tableIds = results;
+
+											var vals = document
+													.getElementsByName("val[]");
+											alert("SELE" + selectedarr.length);
+											inputarr = [];
+											/*
+											for (var i = 0; i < prevSelectedArr.length; i++) {
+												inputarr
+														.push(vals[prevSelectedArr[i]].value);
+											}
+											 */
+											for (var i = 0; i < selectedarr.length; i++) {
+												inputarr
+														.push(vals[selectedarr[i]].value);
+											}
+
+											localStorage.setItem("inputarr",
+													JSON.stringify(inputarr));
+											alert("IN" + inputarr);
+
+											var values = new Array();
+											var tableIds = JSON
+													.parse(localStorage
+															.getItem("tableDetails"));
+											var strArr = new Array();
+
+											for (var i = 0; i < selectedarr.length; i++) {
+												strArr = tableIds[selectedarr[i]].COLUMN_NAMES
+														.split('.');
+												strArr[0] = tableIds[selectedarr[i]].table_alias;
+												str = strArr[0] + '.'
+														+ strArr[1];
+												values.push(str);
+											}
+								
+											var coloumn = values;
+
+											var tabIdArr = new Array();
+
+											for (var i = 0; i < coloumn.length; i++) {
+												for (var j = 0; j < tableIds.length; j++) {
+													if (tableIds[j].COLUMN_NAMES == coloumn[i]) {
+														tabIdArr
+																.push(tableIds[j].table_id);
+														break;
+													}
+												}
+											}
+
+											console.log(tabIdArr);
+
+											var ReportNames = localStorage
+													.getItem('reportsData');
+											var event = JSON.parse(ReportNames);
+											var Reportid = event[0].report_id;
+											var jsonObjtoSend = {};
+											var favorites = [];
+
+											for (var i = 0; i < values.length; i++) {
+												//alert("HHH:"+t[i]['table_id']);
+												jsonObjtoSend.report_id = Reportid;
+												jsonObjtoSend.table_id = tabIdArr[i];
+												jsonObjtoSend.field_name = values[i];
+												jsonObjtoSend.field_label = inputarr[i];
+												jsonObjtoSend.aggregate_field = "N";
+												var tablefieldsdata = (JSON
+														.stringify(jsonObjtoSend));
+												favorites.push(tablefieldsdata);
+											}
+											alert("FAV" + favorites);
+											var tablelist = JSON
+													.stringify(favorites);
+											var datas = JSON.parse(tablelist);
+
+											var data = "{" + "ColoumnLists"
+													+ ":" + "[" + datas + "]"
+													+ "}";
+
+											inputarr = [];
+											if (prevSelectedArr != null) {
+												for (var i = 0; i < prevSelectedArr.length; i++) {
+													inputarr
+															.push(vals[prevSelectedArr[i]].value);
+												}
+											}
+											for (var i = 0; i < selectedarr.length; i++) {
+												inputarr
+														.push(vals[selectedarr[i]].value);
+											}
+
+											localStorage.setItem("inputarr",
+													JSON.stringify(inputarr));
+
+											var values = new Array();
+											var tableIds = JSON
+													.parse(localStorage
+															.getItem("tableDetails"));
+											var strArr = new Array();
+											if (prevSelectedArr != null) {
+												for (var i = 0; i < prevSelectedArr.length; i++) {
+													strArr = tableIds[prevSelectedArr[i]].COLUMN_NAMES
+															.split('.');
+													strArr[0] = tableIds[prevSelectedArr[i]].table_alias;
+													str = strArr[0] + '.'
+															+ strArr[1];
+													values.push(str);
+												}
+											}
+											for (var i = 0; i < selectedarr.length; i++) {
+												strArr = tableIds[selectedarr[i]].COLUMN_NAMES
+														.split('.');
+												strArr[0] = tableIds[selectedarr[i]].table_alias;
+												str = strArr[0] + '.'
+														+ strArr[1];
+												values.push(str);
+											}
+
+											localStorage.setItem("selectedarr",
+													"");
+
+											alert("InsertReportColoumns"+data);
+   
+
+											$
+													.ajax({
+														url : SERVER_URL
+																+ '/InsertReportColoumns',
+														type : 'POST',
+														data : data,
+														dataType : 'JSON',
+														contentType : "application/json",
+														success : function(data) {
+															console.log(data);
+														}
+													});
+
+											
+
+											var jsonObjtoSend = {};
+
+											jsonObjtoSend.report_id = Reportid;
+											jsonObjtoSend.table_1_id = $(
+													'#DLState3').val();
+											jsonObjtoSend.join_type = $(
+													'#joins').val();
+											jsonObjtoSend.table_2_id = $(
+													'#DLState4').val();
+											jsonObjtoSend.join_condition = " ON "
+													+ $('#Addjoincondition')
+															.val();
+
+											var data = (JSON
+													.stringify(jsonObjtoSend));
+											// alert(data);
+
+											$
+													.ajax({
+														url : SERVER_URL
+																+ '/InsertReportQuery',
+														type : 'POST',
+														data : data,
+														dataType : 'JSON',
+														contentType : "application/json",
+														success : function(data) {
+															console.log(data);
+
+														}
+													});
+											
+
+											if (localStorage
+													.getItem('mulJoinsArr') != undefined) {
+												var multijoinsarray = JSON
+														.parse(localStorage
+																.getItem('mulJoinsArr'));
+											} else {
+												var multijoinsarray = [];
+											}
+
+											var datas = (JSON
+													.stringify(multijoinsarray));
+											var data = {};
+											data = "{" + "tableList" + ":"
+													+ datas + "}";													
+																								
+
+											$
+													.ajax({
+														url : SERVER_URL
+																+ '/multiplejoinsinsert',
+														type : 'POST',
+														data : data,
+														dataType : 'JSON',
+														contentType : "application/json",
+														success : function(data) {
+															console.log(data);
+
+														}
+													});
+
+											localStorage.removeItem("mulJoinsArr");	
+											window.location.href = "4.html";
+
+										});
+
+					});
+</script>
+<script>
+	$("#header").load("header.html");
+	$("#footer").load("footer.html");
+</script>
+</html>

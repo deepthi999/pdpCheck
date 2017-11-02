@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="prospecta" packages="">
+	<Appenders>
+		<RollingFile name="asms" fileName="/data/logs/asms.log" filePattern="/data/logs/$${date:yyyy-MM}/asms-%d{MM-dd-yyyy}-%i.log">
+			<PatternLayout>
+				<Pattern>%d %p{DEBUG=D, ERROR=E, FATAL=F, INFO=I, TRACE=T, WARN=W} [%X{webSessionID} %M@%C{1}] %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="3 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="3"/>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="asms" level="all" additivity="false">
+			<AppenderRef ref="asms"/>
+		</Logger>
+		<Root level="error">
+			<AppenderRef ref="asms"/>
+		</Root>
+	</Loggers>
+</Configuration>

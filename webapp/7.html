@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Select Tables</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="Style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+
+    var tablearr = [];
+    var selectedarr = [];
+    var inputarr = [];
+    var tmpinputarr = [];
+
+
+    function verifying() {
+
+
+      var ReportNames = localStorage.getItem('reportsData');
+      var event = JSON.parse(ReportNames);
+//alert(event);
+      var Reportname = event[0].report_name;
+//alert("hi..."+ Reportname);
+
+      document.getElementById("reportName").innerHTML = Reportname;
+//alert(ReportNames);
+    }
+  </script>
+</head>
+
+
+<body onload="verifying();">
+
+<div id="header"></div>
+
+<div class="container" style="margin-bottom: 90px;">
+  <div class="panel panel-default panel-box">
+    <div class="panel-heading"><b>Report Name :</b> <span id="spantext"></span></div>
+    <div class="panel-body">
+      <table class="table table-bordered" border="1" cellpadding="5" cellspacing="5">
+
+        <tr>
+          <th>Field Name</th>
+          <th>Sort Order</th>
+          <th>Alias</th>
+        </tr>
+        <tr>
+          <td>t1.Column1</td>
+          <td>1</td>
+          <td><a href="#" onclick="myFunction()">Column1</a></td>
+        </tr>
+        <tr>
+          <td>Column2</td>
+          <td>2</td>
+          <td><a href="#" onclick="myFunction()">Column3</a></td>
+        </tr>
+        <tr>
+          <td>fnGetTypeDescription(t1.type_id)</td>
+          <td>3</td>
+          <td><a href="#" onclick="myFunction()">Type</a></td>
+        </tr>
+        <tr>
+          <td>Substring(t2.name, 10)</td>
+          <td>4</td>
+          <td><a href="#" onclick="myFunction()">"Item Code"</a></td>
+        </tr>
+      </table>
+
+      <h4>Edit Conditions (if any)</h4>
+      <textarea id="txtArea" class="form-control" rows="6" cols="40" name="ReportDescription">WHERE t2.Column2 IN (10, 20, 30)
+AND t3.Column9 = 'OPEN'
+</textarea>
+      <h4>Edit Filters</h4>
+      <table class="table table-bordered">
+        <tr>
+          <th>Field Name</th>
+          <th>Type</th>
+          <th>Operator</th>
+          <th>Query</th>
+        </tr>
+        <tr>
+          <td><input class="form-control" type="text" name="Hello5"/></td>
+          <td><input class="form-control" type="text" name="Hello6"/></td>
+          <td><input class="form-control" type="text" name="Hello7"/></td>
+          <td><input class="form-control" type="text" name="Hello8"/></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="footer"></div>
+</body>
+<script>
+
+  //$('#DLState').on('change', function () {
+  $(document).ready(function () {
+
+
+    var jsonObjToSend = {};
+    var selecteddbname = localStorage.getItem('databaseName');
+//jsonObjToSend.dbName = this.value;
+    jsonObjToSend.dbName = selecteddbname;
+    $.ajax({
+      url: 'http://localhost:8080/pdp/ClientService/getTables',
+      type: 'POST',
+      dataType: 'json',
+      contentType: "application/json ; charset=utf-8",
+      data: JSON.stringify(jsonObjToSend),
+      success: function (data, textStatus, xhr) {
+
+        console.log(data);
+        // bindTableData(data);
+        getTableList(data);
+
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+      }
+    });
+
+
+  });
+</script>
+<script type="text/javascript">
+  function bindDropBox_DataBases(oData) {
+    var listItems = '<option selected="selected" value="0">- Select -</option>';
+
+    for (var i = 0; i < oData.returnData.length; i++) {
+      /*  listItems += "<option value='" + oData.returnData[i].Database + "'>" + oData.returnData[i].Database + "</option>"; */
+      listItems += "<option value='" + oData.returnData[i].database_name + "'>" + oData.returnData[i].database_name + "</option>";
+    }
+    $("#DLState").html(listItems);
+  }
+
+
+  //for alias
+
+
+  function getTableList(data) {
+
+    var dBname = localStorage.getItem('databaseName');
+    var arr = data.returnData;
+    for (i = 0; i < arr.length; i++) {
+      tablearr.push(arr[i].TABLE_NAME);
+    }
+    // alert(tablearr);
+
+    tmpstr = "<table border= \"1px\">";
+    tmpstr = tmpstr + "<th></th>" + "<th>" + "Tables From " + dBname + "</th>";
+
+    //document.getElementById("tbname").innerHTML = "<table>";
+    for (var i = 0; i < tablearr.length; i++) {
+      //alert("heee");
+      str = '<tr><td><input type="checkbox" id="tabId' + i + '" value="' + tablearr[i] + '" onClick="checkedTable(' + i + ')"/></td>';
+
+      tmpstr += str + '<td>' + tablearr[i] + '</td></tr>';
+
+    }
+    // alert(tmpstr);
+    document.getElementById("tbname").innerHTML = tmpstr;
+  }
+
+  function checkedTable(tabId) {
+    var flag = false;
+    for (i = 0; i < selectedarr.length; i++) {
+      if (selectedarr[i] == tablearr[tabId]) {
+        selectedarr.splice(i, 1);
+        tmpinputarr.splice(i, 1);
+        flag = true;
+        break;
+      }
+    }
+    if (flag == false) {
+      selectedarr.push(tablearr[tabId]);
+      tmpinputarr = [];
+      var vals = document.getElementsByName("val[]");
+      for (var i = 0; i < vals.length; i++) {
+        //alert(vals[i].id);
+        tmpinputarr.push(vals[i].value);
+      }
+
+    }
+
+    //alert(selectedarr);
+    //alert("here");
+    //alert(tmpinputarr);
+    var tmp = '';
+    tmp = "<table border= \"1px\">";
+    for (var i = 0; i < selectedarr.length; i++) {
+      if (tmpinputarr.length == 0) {
+        str = '<td><input type="text" id="selTabId_' + i + '_' + selectedarr[i] + '" name="val[]" value=""/></td>';
+      } else {
+        if (tmpinputarr[i] == undefined)
+          str = '<td><input type="text" id="selTabId_' + i + '_' + selectedarr[i] + '" name="val[]" value=""/></td>';
+        else
+          str = '<td><input type="text" id="selTabId_' + i + '_' + selectedarr[i] + '" name="val[]" value="' + tmpinputarr[i] + '"/></td>';
+      }
+      tmp += '<tr><td>' + selectedarr[i] + '</td>' + str + '</tr>';
+    }
+    tmp += '</table>';
+    document.getElementById("selectedtb").innerHTML = tmp;
+
+  }
+
+  function validate() {
+    var vals = document.getElementsByName("val[]");
+    inputarr = [];
+    json = {};
+    jsonObj = [];
+
+    var values = new Array();
+
+    for (var i = 0; i < vals.length; i++) {
+
+
+      //alert(vals[i].id);
+      if (vals[i].value == "") {
+        alert("No Empty Values Allowed");
+        inputarr = [];
+        break;
+      }
+      else inputarr.push(vals[i].value);
+
+      //result.push(selectedarr[i],inputarr[i]);
+
+
+      //  json.push(table_name:selectedarr[i],table_alias:inputarr[i]);
+
+
+      var ReportNames = localStorage.getItem('reportsData');
+      var event = JSON.parse(ReportNames);
+      // alert(event);
+      var Reportid = event[0].report_id;
+
+
+      values.push(selectedarr[i]);
+
+
+      json.tablename = selectedarr[i];
+      json.table_alias = inputarr[i];
+      json.report_id = Reportid;
+      var data = JSON.stringify(json);
+      // alert(data);
+      jsonObj.push(data);
+
+
+    }
+    //alert(JSON.stringify(jsonObj));
+
+
+    var jsonObjtoSend = values;
+    // alert( JSON.stringify(jsonObjtoSend));
+    localStorage.setItem('lists', JSON.stringify(jsonObjtoSend));
+
+
+    var tablelist = JSON.stringify(jsonObj);
+    var datas = JSON.parse(tablelist);
+
+
+    var data = "{" + "tableList" + ":" + "[" + datas + "]" + "}";
+    alert(data);
+
+
+    $.ajax({
+
+      url: 'http://localhost:8080/pdp/ReportsService/InsertReportTables',
+      type: 'POST',
+      data: data,
+      dataType: 'JSON',
+      contentType: "application/json",
+      success: function (returnData, textStatus, xhr) {
+        console.log(data);
+
+
+        bindTableDatab(returnData);
+
+      }
+    });
+
+    function bindTableDatab(returnData) {
+
+      var arr = returnData.returnData;
+
+      var d = JSON.stringify(arr);
+
+      //alert("bhrr" + d);
+      localStorage.setItem('list', d);
+      window.location.href = "3.html";
+
+    }
+
+
+    return false;
+  }
+
+
+  //end for alias
+
+
+  function bindTableData(data) {
+
+    var arr = data.returnData;
+    var table = "<html><table border=\"1px\">";
+    var chk = "<td>" + "<input type='checkbox' name='chk' onclick='dynInput(this)' val=''  />" + "</td>";
+    var dbname = localStorage.getItem('databaseName');
+
+    table = table + "<th></th>" + "<th>" + "Tables From " + dbname + "</th>";
+
+    var i;
+
+
+    // var out = "<table>";
+    for (i = 0; i < arr.length; i++) {
+      table = table + "<tr>";
+
+      table = table + chk + "<td>" + arr[i].TABLE_NAME + "</td>";
+      table = table + "</tr>";
+
+
+    }
+
+    table += "</table></html>";
+    document.getElementById("tableId").innerHTML = table;
+  }
+
+
+  /* function bindTableDatab(returnData){
+
+      var arr = returnData.returnData;
+
+      var d=JSON.stringify(arr);
+
+      alert("bhrr" + d);
+       localStorage.setItem('list', d);
+
+
+  } */
+
+
+  $(document).ready(function () {
+
+
+    var jsonObjToSend = {};
+    $.ajax({
+      url: 'http://localhost:8080/pdp/ReportsService/show_databases',
+      type: 'POST',
+      dataType: 'json',
+      contentType: "application/json ; charset=utf-8",
+      data: JSON.stringify(jsonObjToSend),
+      success: function (data, textStatus, xhr) {
+
+        console.log(data);
+        bindDropBox_DataBases(data);
+
+
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+      }
+    });
+
+  });
+
+  $(document).ready(function () {
+
+
+    $("#btnSave").click(function () {
+      var values = new Array();
+
+      $.each($("input[name='chk']:checked").closest("td").siblings("td"),
+        function () {
+          values.push($(this).text());
+        });
+
+      /*  alert("values are...." + values.join (", ")); */
+      var jsonObjtoSend = values;
+      // alert( JSON.stringify(jsonObjtoSend));
+      localStorage.setItem('lists', JSON.stringify(jsonObjtoSend));
+
+
+      var values = new Array();
+
+      $.each($("input[name='chk']:checked").closest("td").siblings("td"),
+        function () {
+          values.push($(this).text());
+        });
+
+      var ReportNames = localStorage.getItem('reportsData');
+      var event = JSON.parse(ReportNames);
+      // alert(event);
+      var Reportid = event[0].report_id;
+      //  alert("reportids"+ Reportid);
+
+
+      // alert(ReportNames);
+
+
+      var jsonObjtoSend = {};
+      var favorites = [];
+
+      //var jsonObjtoSend=JSON.stringify ("tablename" + ":" +values);
+      for (var i = 0; i < values.length; i++) {
+
+
+        jsonObjtoSend.tablename = values[i];
+        jsonObjtoSend.report_id = Reportid;
+        jsonObjtoSend.table_alias = values[i] + Reportid;
+        //alert(jsonObjtoSend.table_alias);
+        //var data=JSON.stringify("tablename" + ":" +jsonObjtoSend);
+        var data = JSON.stringify(jsonObjtoSend);
+        // alert(data);
+        favorites.push(data);
+        //alert ("tablename" + ":" +favorites);
+
+        //   alert(JSON.stringify(jsonObjtoSend));
+
+      }
+
+
+      var tablelist = JSON.stringify(favorites);
+      var datas = JSON.parse(tablelist);
+
+
+      var data = "{" + "tableList" + ":" + "[" + datas + "]" + "}";
+
+      //var data=tablelistt;
+      // var data="tablenames" + ":" +favorites;
+      //alert ("tablename" + ":" +favorites);
+      // alert(data);
+
+
+      $.ajax({
+
+        url: 'http://localhost:8080/pdp/ReportsService/InsertReportTables',
+        type: 'POST',
+        data: data,
+        dataType: 'JSON',
+        contentType: "application/json",
+        success: function (returnData, textStatus, xhr) {
+          console.log(data);
+
+
+          bindTableDatab(returnData);
+
+        }
+      });
+
+      function bindTableDatab(returnData) {
+
+        var arr = returnData.returnData;
+
+        var d = JSON.stringify(arr);
+
+        //alert("bhrr" + d);
+        localStorage.setItem('list', d);
+        window.location.href = "3.html";
+
+      }
+
+
+    });
+  });
+</script>
+<script>
+  function dynInput(cbox) {
+    if (cbox.checked) {
+
+      var values = new Array();
+
+      var fruits = [];
+
+      $.each($("input[name='chk']:checked").closest("td").siblings("td"),
+        function (i) {
+
+          var aliasSec = localStorage.getItem("aliasSection");
+
+          if (aliasSec == undefined) {
+
+            //values.push($(this).text());
+            var str = $(this).text();
+
+            alert("HEELO" + str);
+            // div.innerHTML =   str;
+
+            var table = "<html><table border=\"1px\">";
+            var chk = "<td>" + "<input type='checkbox' name='chkkalias' onclick='alias(this)' val=''  />" + "</td>";
+            table = table + "<th></th>" + "<th>" + "tbname" + "</th>" + "<th>" + "Table Alias" + "</th>";
+
+
+            table = table + "<tr>";
+
+            table = table + chk + "<td>" + str + "</td>" + "<td>" + "<input type='text' name='chkkalias' id='chkkalias'   val=''  />" + "</td>";
+            fruits.push(table);
+            table = table + "</tr>";
+
+            table += "</table></html>";
+          } else {
+
+            fruits = JSON.parse(aliasSec);
+            var str = $(this).text();
+            alert("Hheeee" + str);
+            var chk = "<td>" + "<input type='checkbox' name='chkkalias' onclick='alias(this)' val=''  />" + "</td>";
+            table = "<tr>";
+            table = table + chk + "<td>" + str + "</td>" + "<td>" + "<input type='text' name='chkkalias' id='chkkalias' val=''  />" + "</td>";
+            fruits.push(table);
+            table = table + "</tr>";
+          }
+        });
+      localStorage.setItem("aliasSection", JSON.stringify(fruits));
+      document.getElementById("a").innerHTML = fruits;
+
+
+      //  div.appendChild(input);
+
+
+      //document.getElementById(tr).appendChild(div);
+    } else {
+      document.getElementById("a").remove();
+    }
+  }
+
+</script>
+<script>
+
+  $(document).ready(function () {
+
+    var ReportNames = localStorage.getItem('reportsData');
+    var event = JSON.parse(ReportNames);
+    //alert(event);
+    var ReportId = event[0].report_id;
+    //alert("hi..."+ Reportname);
+
+    var reportid = "{" + "reportid:" + ReportId + "}";
+
+    //alert(reportid);
+
+    $.ajax({
+      url: 'http://localhost:8080/pdp/ReportsService/show_tables',
+      type: 'POST',
+      dataType: 'json',
+      contentType: "application/json ; charset=utf-8",
+      data: reportid,
+      success: function (data, textStatus, xhr) {
+
+        console.log(data);
+        //  selectedtablesbasedonid(data);
+
+
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        console.log('Error in Operation');
+      }
+    });
+
+
+  });
+
+</script>
+<script>
+  $("#header").load("header.html");
+  $("#footer").load("footer.html");
+</script>
+</html>

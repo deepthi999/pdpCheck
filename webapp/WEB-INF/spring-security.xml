@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+	<security:http pattern="/resources/**" security="none" />
+
+	<security:http auto-config="true" use-expressions="true"
+		create-session="ifRequired">
+
+		<security:intercept-url pattern="/reportlist.jsp"
+			access="hasRole('ROLE_USER')" />
+		<security:form-login login-page="/login.jsp"
+			default-target-url="/reportlist.jsp" always-use-default-target="true"
+			authentication-failure-url="/login.jsp?status=error" />
+		<security:logout logout-success-url="/login.jsp?status=logout" />
+
+		<security:custom-filter ref="authenticationFilter"
+			before="FORM_LOGIN_FILTER" />
+		<security:custom-filter ref="concurrencyFilter"
+			after="CONCURRENT_SESSION_FILTER" />
+		<security:session-management
+			session-authentication-strategy-ref="sas" />
+	</security:http>
+
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider>
+			<security:password-encoder ref="encoder" />
+
+			<!-- <security:user-service> <security:user name="mouritech" password="sweety" 
+				authorities="ROLE_USER" /> </security:user-service> -->
+			<security:jdbc-user-service
+				data-source-ref="dataSource"
+				users-by-username-query="select username, password, active from users where username=?"
+				authorities-by-username-query="select us.username, ur.authority from users us, user_roles ur 
+        where us.user_id = ur.user_id and us.username =?  " />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	<!-- <bean id="userDetailsServiceImpl" class="com.serviceImpl.UserDetailsServiceImpl"></bean> -->
+	<bean id="encoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<constructor-arg name="strength" value="10" />
+	</bean>
+
+	<bean id="authenticationFilter"
+		class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<property name="sessionAuthenticationStrategy" ref="sas" />
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationFailureHandler" ref="authFailureHandler" />
+		<property name="authenticationSuccessHandler" ref="authSuccessHandler" />
+	</bean>
+
+	<bean id="authFailureHandler" class="com.session.handler.KeyAuthFailureHandler" />
+
+	<bean id="authSuccessHandler"
+		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+		<property name="defaultTargetUrl" value="/reportlist.jsp" />
+	</bean>
+
+	<bean id="concurrencyFilter"
+		class="org.springframework.security.web.session.ConcurrentSessionFilter">
+		<constructor-arg ref="sessionRegistry" />
+		<constructor-arg value="/session-expired.jsp" />
+	</bean>
+	<bean id="sas"
+		class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+		<constructor-arg>
+			<list>
+				<bean
+					class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+					<constructor-arg ref="sessionRegistry" />
+					<property name="maximumSessions" value="1" />
+					<property name="exceptionIfMaximumExceeded" value="true" />
+				</bean>
+				<bean
+					class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+				</bean>
+				<bean
+					class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+					<constructor-arg ref="sessionRegistry" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="sessionRegistry"
+		class="org.springframework.security.core.session.SessionRegistryImpl" />
+</beans>

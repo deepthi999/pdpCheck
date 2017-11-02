@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.mybatis.mappers.ReportMapper'>
+
+
+
+<select id="CreateReport" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spCreateReport1(#{rep_name, jdbcType = VARCHAR, mode = IN},#{rep_desc, jdbcType = VARCHAR, mode = IN},  ${rep_cat }, ${db_id});
+
+  </select>
+
+<select id="InsertReportTables" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spInsertReportTables1(${report_id},#{tablename, jdbcType = VARCHAR, mode = IN},  #{table_alias, jdbcType = VARCHAR, mode = IN});
+
+  </select>
+  
+  
+  <select id="InsertReportColoumns" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spInsertReportFields(${report_id},#{table_id},  #{field_name, jdbcType = VARCHAR, mode = IN}, #{field_name_hidden, jdbcType = VARCHAR, mode = IN}, #{field_label, jdbcType = VARCHAR, mode = IN}, #{aggregate_field, jdbcType = VARCHAR, mode = IN},#{aggregator, jdbcType = VARCHAR, mode = IN},#{sort_position},#{is_display, jdbcType = VARCHAR, mode = IN});
+  </select>
+  
+  <select id="InsertReportQuery" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spInsertReportJoins1(${report_id},#{table_1_id},#{join_type, jdbcType = VARCHAR, mode = IN},#{table_2_id},#{join_condition, jdbcType = VARCHAR, mode = IN});
+
+  </select>
+  
+    
+ <select id="multiplejoinsinsert" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spInsertReportJoins1(${report_id},#{table_1_id},#{join_type, jdbcType = VARCHAR, mode = IN},#{table_2_id},#{join_condition, jdbcType = VARCHAR, mode = IN});
+
+
+  </select>
+  
+   <select id="checkTableId" parameterType="java.util.Map" resultType="java.util.HashMap" >
+
+SELECT * from sunset.mt_report_table_joins where report_id = ${report_id} and table_1_id = ${table_1_id} and table_2_id = ${table_2_id};
+
+  </select>
+  
+  <select id="getTableIdObj" parameterType="java.util.Map" resultType="java.util.HashMap" >
+
+SELECT * from sunset.mt_report_tables where table_id = ${table_1_id};
+
+  </select>
+  
+  <select id="insTableIdObj" parameterType="java.util.Map" resultType="java.util.HashMap" >
+
+INSERT INTO sunset.mt_report_tables (report_id, tablename, table_alias) VALUES (${report_id}, '${tablename}', '${table_alias}');
+  </select>
+  
+   <select id="getInsTableIdObj" parameterType="java.util.Map" resultType="java.util.HashMap" >
+
+SELECT * from sunset.mt_report_tables where table_alias = '${table_alias}';
+
+  </select>
+  
+  
+  
+	 <select id="show_Category" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+	SELECT report_category_name,report_category_id FROM sunset.mt_report_categories;
+  </select>
+
+	  <select id="show_databases" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+	SELECT * FROM sunset.mt_report_databases;
+	
+  </select>
+  
+   <select id="show_tables" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+SELECT TABLE_NAME from information_schema.tables WHERE table_schema = #{dbName};
+  </select>
+  
+  <select id="show_coloumns" parameterType="java.util.List"  fetchSize="25" resultType="java.util.HashMap" >
+
+select table_name,concat(table_alias,'.',COLUMN_NAME) AS COLUMN_NAMES from information_schema.columns where table_name  IN 
+<foreach item="tablename" collection="list" index="index" open="(" separator="," close=")">
+     #{tablename}
+    </foreach>
+  </select>
+  
+  
+  
+  <select id="show_fields" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+select COLUMN_NAME AS COLUMN_NAMES from information_schema.columns where table_name = #{tablename};
+  </select>
+  
+  <select id="show_queryPreview" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+select COLUMN_NAME AS COLUMN_NAMES from information_schema.columns where table_name = #{tablename};
+  </select>
+  
+ <select id="show_ReportsList" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+select report_name, report_description from sunset.mt_reports ;
+  </select>
+  
+   <select id="show_Reportsdetails" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+select report_id,report_name from sunset.mt_reports ;
+  </select>
+  
+  
+   <select id="show_tableNamesbasedonid" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+SELECT tablename,table_alias FROM sunset.mt_report_tables WHERE report_id=#{reportid};
+  </select>
+  
+   <select id="show_ColoumnNamesbasedonid" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+SELECT * from sunset.mt_report_table_fields where report_id=#{reportid};
+  </select>
+  
+  <select id="getjoins" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+SELECT * FROM sunset.mt_report_table_joins WHERE report_id=#{reportid};
+  </select>
+      
+      <select id="deletejoins" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+        call spRemoveReportJoins(${report_id},${join_id});
+  </select>
+  
+  
+  
+  
+  <select id="finalQuery" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+CALL spGenerateReport(${report_id});
+
+  </select>
+  
+    <select id="ExecutefinaQuery" parameterType="java.util.Map" resultType="java.util.HashMap"  >
+${query} where 1=0;
+  </select>
+  
+     <select id="runExecutefinaQuery" parameterType="java.util.Map" resultType="java.util.HashMap" fetchSize="500" >
+${query} limit 15;
+  </select>
+  
+  <select resultType="java.util.HashMap" parameterType="java.util.Map" id="getListOfEmployee" fetchSize="25">
+   select * from users where USERNAME = #{uname} and password = #{pwd} ;
+    </select>
+    
+    <select id="deleteColumnrow" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+                    call spRemoveReportFields(${report_id},${table_id},${field_id});
+  </select>
+    
+    <select id="deleteTablerow" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+                     call spRemoveReportTables(${report_id},${table_id});
+  </select>
+    
+    <select resultType="java.util.HashMap" parameterType="java.util.Map" id="show_Reports" fetchSize="25">
+   select report_name from sunset.mt_reports  ;
+    </select>
+    
+    
+    
+    
+        <select id="getWherecondition" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+        CALL spInsertReportCriteria(${criteria_id},${report_id}, '${criteria}');
+  </select>
+    
+       <select id="fetchwherecondition" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+       CALL spGetReportCriteriaByReportId(${report_id});
+  </select>
+    
+    <select id="insertparameter" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+     CALL spInsertReportParameters(${report_id},${criteria_id}, '${param_name}', '${param_label}', '${param_type}', '${param_query}', '${is_multi}', '${quotes_enclosed}',${seq});
+  </select>   
+
+<!-- <select id="getparameter" statementType="CALLABLE" resultType="java.util.HashMap" parameterType="java.util.Map" >
+ CALL spGetReportParameters(${report_id}); 
+ </select> -->
+ 
+ <select id="getparameter" statementType="CALLABLE" resultType="java.util.HashMap" parameterType="java.util.Map" >
+ CALL spGetReportCriteria(${report_id},${criteria_id}); 
+ </select>
+ 
+ <select id="UpdateReportJoins" statementType="CALLABLE" resultType="java.util.HashMap" parameterType="java.util.Map" >
+ CALL spUpdateReportJoins(${join_id},${report_id},${table_1_id},'${join_type}',${table_2_id},'${join_condition}'); 
+ </select>
+  
+   <select id="getalreadyinsertedjoinsbyid" parameterType="java.util.Map"  fetchSize="25" resultType="java.util.HashMap" >
+	
+select * from sunset.mt_report_table_joins where join_id= ${joinid};
+  </select>
+    
+     <select id="deleteparams" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+                     call spRemoveReportCriteria(${report_id},${criteria_id});
+  </select>
+  
+  
+  
+   <select id="show_users" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+SELECT sunset.mt_organization.org_name,sunset.mt_user.user_name,sunset.mt_user.Role FROM sunset.mt_user 
+INNER JOIN sunset.mt_organization ON sunset.mt_organization.org_id =sunset.mt_user.org_id where sunset.mt_user.org_id=#{org_id};
+
+  </select>
+  
+  
+  
+  <!--  For inserting Where condition and param  -->
+ 
+     <select id="insertCriteriaAndParams" parameterType="java.util.Map" resultType="java.util.HashMap" statementType="CALLABLE" >
+        CALL spInsertReportCriteria(${criteria_id}, ${report_id}, '${criteria_prefix}', '${start_brace}', ${criteria_table_id_1}, ${criteria_field_id_1}, '${criteria_field_name_1}', '${criteria_operator}', ${criteria_table_id_2}, ${criteria_field_id_2}, ':${criteria_field_name_2}:', '${end_brace}', '${criteria_label}', '${criteria_type}', '${criteria_query}', '${quotes_enclosed}', ${seq});
+     </select>
+  
+  
+  
+  
+  
+  
+  
+</mapper>
